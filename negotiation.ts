@@ -4,6 +4,12 @@ import { preferredEncodings } from "./negotiation/encoding.ts";
 import { preferredLanguages } from "./negotiation/language.ts";
 import { preferredMediaTypes } from "./negotiation/mediaType.ts";
 
+export type Request = {
+  headers: {
+    get(key: string): string | null;
+  };
+};
+
 /** Returns an array of media types accepted by the request, in order of
  * preference. If there are no media types supplied in the request, then any
  * media type selector will be returned. */
