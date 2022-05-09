@@ -1,5 +1,14 @@
 // Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
 
+/**
+ * Provides the {@linkcode KeyStack} class which implements the `KeyRing`
+ * interface for managing rotatable keys.
+ *
+ * Intended to be used with `Cookies` to enable key signing.
+ *
+ * @module
+ */
+
 import { base64 } from "./deps.ts";
 import { type Data, type Key, type KeyRing } from "./types.d.ts";
 
@@ -104,14 +113,14 @@ export class KeyStack implements KeyRing {
    * data and allows easy key rotation without invalidation of previously signed
    * data.
    *
-   * @param keys An array of keys, of which the index 0 will be used to sign
+   * @param keys An iterable of keys, of which the index 0 will be used to sign
    *             data, but verification can happen against any key.
    */
-  constructor(keys: Key[]) {
+  constructor(keys: Iterable<Key>) {
     if (!(0 in keys)) {
       throw new TypeError("keys must contain at least one value");
     }
-    this.#keys = keys;
+    this.#keys = [...keys];
   }
 
   /** Take `data` and return a SHA256 HMAC digest that uses the current 0 index

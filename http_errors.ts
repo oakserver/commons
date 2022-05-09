@@ -1,5 +1,19 @@
 // Copyright 2018-2021 the oak authors. All rights reserved. MIT license.
 
+/** A collection of HTTP errors and utilities.
+ *
+ * The export {@linkcode errors} contains an individual class that extends
+ * {@linkcode HttpError} which makes handling HTTP errors in a structured way.
+ *
+ * The function {@linkcode createHttpError} provides a way to create instances
+ * of errors in a factory pattern.
+ *
+ * The function {@linkcode isHttpError} is a type guard that will narrow a value
+ * to an `HttpError` instance.
+ *
+ * @module
+ */
+
 import {
   type ErrorStatus,
   isClientErrorStatus,

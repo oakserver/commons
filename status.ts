@@ -1,5 +1,13 @@
 // Copyright 2018-2021 the oak authors. All rights reserved. MIT license.
 
+/**
+ * Contains the enum {@linkcode Status} which enumerates standard HTTP status
+ * codes and provides several type guards for handling status codes with type
+ * safety.
+ *
+ * @modules
+ */
+
 /** Standard HTTP status codes. */
 export enum Status {
   /** RFC 7231, 6.2.1 */

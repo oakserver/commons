@@ -1,5 +1,12 @@
 // Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
 
+/**
+ * Provides the {@linkcode Cookies} class which provides an async iterable
+ * interface for reading and writing cookies from a request and response.
+ *
+ * @module
+ */
+
 import { type KeyRing } from "./types.d.ts";
 
 export interface CookiesOptions {

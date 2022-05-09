@@ -1,5 +1,11 @@
 // Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
 
+/**
+ * Contains abstract types and interfaces used in other parts of oak_common.
+ *
+ * @module
+ */
+
 /** Types of data that can be signed cryptographically. */
 export type Data = string | number[] | ArrayBuffer | Uint8Array;
 

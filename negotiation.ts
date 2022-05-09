@@ -1,5 +1,12 @@
 // Copyright 2018-2021 the oak authors. All rights reserved. MIT license.
 
+/**
+ * Contains the functions {@linkcode accepts}, {@linkcode acceptsEncodings}, and
+ * {@linkcode acceptsLanguages} to provide content negotiation capabilities.
+ *
+ * @module
+ */
+
 import { preferredEncodings } from "./negotiation/encoding.ts";
 import { preferredLanguages } from "./negotiation/language.ts";
 import { preferredMediaTypes } from "./negotiation/mediaType.ts";

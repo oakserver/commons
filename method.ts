@@ -1,5 +1,13 @@
 // Copyright 2018-2021 the oak authors. All rights reserved. MIT license.
 
+/**
+ * Contains the constant {@linkcode HTTP_METHODS} and the type
+ * {@linkcode HttpMethods} and the type guard {@linkcode isHttpMethod} for
+ * working with HTTP methods with type safety.
+ *
+ * @module
+ */
+
 export const HTTP_METHODS = [
   "HEAD",
   "OPTIONS",
