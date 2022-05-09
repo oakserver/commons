@@ -1,79 +1,39 @@
 # oak commons
 
+[![oak_commons ci](https://github.com/oakserver/commons/workflows/ci/badge.svg)](https://github.com/oakserver/commons)
+[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/oak_commons)
+
 A set of APIs that are common to HTTP/HTTPS servers.
 
-## HTTP Methods (`/method.ts`)
+Each module is designed to be largely independent of other modules, with as few
+shared dependencies as reasonable. These modules are designed as building blocks
+for more complex HTTP/HTTPS and server frameworks.
 
-A set of APIs for dealing with HTTP methods.
+The [acorn](https://deno.land/x/acorn) RESTful services framework is an example
+of something built on top of oak_commons.
 
-## Content Negotiation (`/negotiation.ts`)
+The
+[inline documentation](https://doc.deno.land/https://deno.land/x/oak_commons)
+for each modules is the best guide on the usage of the APIs:
 
-A set of APIs for dealing with content negotiation of HTTP requests.
+- [/cookies.ts](https://doc.deno.land/https://deno.land/x/oak_commons/cookies.ts) -
+  an abstraction for handling request and response cookies, including automatic
+  signing of cookies to prevent tampering.
+- [/http_errors.ts](https://doc.deno.land/https://deno.land/x/oak_commons/http_errors.ts) -
+  utilities for working with HTTP Error status as JavaScript errors.
+- [/key_stack.ts](https://doc.deno.land/https://deno.land/x/oak_commons/key_stack.ts) -
+  a key ring for handling signing of arbitrary data to prevent tampering,
+  designed to work with the `Cookies` abstraction.
+- [/method.ts](https://doc.deno.land/https://deno.land/x/oak_commons/method.ts) -
+  utilities for working with HTTP methods/verbs in a type safe way.
+- [/negotiation.ts](https://doc.deno.land/https://deno.land/x/oak_commons/negotiation.ts) -
+  utilities for content, language, and encoding negotiation with requests and
+  responses.
+- [/status.ts](https://doc.deno.land/https://deno.land/x/oak_commons/status.ts) -
+  utilities for working with HTTP statuses in a type safe way.
+- [/types.d.ts](https://doc.deno.land/https://deno.land/x/oak_commons/types.d.ts) -
+  abstract types and interfaces which are used by oak_commons.
 
-### `accepts()`
+---
 
-Negotiates an acceptable content type based upon the request. The function can
-be called without any content types and the accepted content types will be
-returned in priority order as an array of strings, or a set of content types can
-be passed when calling the function and the best match is returned or
-`undefined` if no match is made.
-
-```ts
-import { accepts } from "https://deno.land/x/oak_commons/negotiation.ts";
-
-declare const req: Request;
-
-// returns acceptable content types in priority order
-accepts(req);
-
-// returns the best matching content type of the ones provided
-accepts(req, ["text/html", "application/json", "text/plain"]);
-```
-
-### `acceptsEncoding()`
-
-Negotiates an acceptable encoding type based upon the request. The function can
-be called without any encodings and the accepted content types will be returned
-in priority order as an array of strings, or a set of encodings can be passed
-when calling the function and the best match is returned or `undefined` if no
-match is made.
-
-You should always supply `identity` as one of the encodings to ensure that there
-is a match when the `Accept-Encoding` header is part of the request.
-
-```ts
-import { acceptsEncodings } from "https://deno.land/x/oak_commons/negotiation.ts";
-
-declare const req: Request;
-
-// returns acceptable encodings in priority order
-acceptsEncodings(req);
-
-// returns the best matching encoding of the ones provided
-acceptsEncodings(req, ["gzip", "identity"]);
-```
-
-### `acceptsLanguages()`
-
-Negotiates an acceptable language based upon the request. The function can be
-called without any languages and the accepted languages will be returned in
-priority order as an array of strings, or a set of languages can be passed when
-calling the function and the best language is returned or `undefined` if no
-match is made.
-
-```ts
-import { acceptsLanguages } from "https://deno.land/x/oak_commons/negotiation.ts";
-
-declare const req: Request;
-
-// returns acceptable languages in priority order
-acceptsLanguages(req);
-
-// returns the best matching language of the ones provided
-acceptsLanguages(req, ["en-gb", "en", "fr"]);
-```
-
-## HTTP Status (`/status.ts`)
-
-An enum, a constant record and a set of guard functions for dealing with HTTP
-status codes.
+Copyright 2018 - 2022 the oak authors. All rights reserved. MIT License.
