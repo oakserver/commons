@@ -1,4 +1,4 @@
-// Copyright 2018-2021 the oak authors. All rights reserved. MIT license.
+// Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
 
 import { assertEquals } from "./deps_test.ts";
 import { accepts, acceptsEncodings, acceptsLanguages } from "./negotiation.ts";

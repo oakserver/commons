@@ -1,4 +1,4 @@
-// Copyright 2018-2021 the oak authors. All rights reserved. MIT license.
+// Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
 
 /** A collection of HTTP errors and utilities.
  *
@@ -63,7 +63,7 @@ const ERROR_STATUS_MAP = {
   "NetworkAuthenticationRequired": 511,
 } as const;
 
-type ErrorStatusKeys = keyof typeof ERROR_STATUS_MAP;
+export type ErrorStatusKeys = keyof typeof ERROR_STATUS_MAP;
 
 /** The base class that all derivative HTTP extend, providing a `status` and an
  * `expose` property. */

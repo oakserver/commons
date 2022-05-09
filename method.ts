@@ -1,4 +1,4 @@
-// Copyright 2018-2021 the oak authors. All rights reserved. MIT license.
+// Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
 
 /**
  * Contains the constant {@linkcode HTTP_METHODS} and the type
@@ -23,6 +23,5 @@ export type HttpMethods = typeof HTTP_METHODS[number];
 
 /** A type guard that determines if a value is a valid HTTP method. */
 export function isHttpMethod(value: unknown): value is HttpMethods {
-  // deno-lint-ignore no-explicit-any
-  return HTTP_METHODS.includes(value as any);
+  return HTTP_METHODS.includes(value as HttpMethods);
 }

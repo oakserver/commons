@@ -120,7 +120,7 @@ export class KeyStack implements KeyRing {
     if (!(0 in keys)) {
       throw new TypeError("keys must contain at least one value");
     }
-    this.#keys = [...keys];
+    this.#keys = Array.isArray(keys) ? keys : [...keys];
   }
 
   /** Take `data` and return a SHA256 HMAC digest that uses the current 0 index
