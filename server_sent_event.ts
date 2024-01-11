@@ -378,7 +378,9 @@ export class ServerSentEventStreamTarget extends EventTarget
     return dispatched;
   }
 
-  [Symbol.for("Deno.customInspect")](inspect: (value: unknown) => string) {
+  [Symbol.for("Deno.customInspect")](
+    inspect: (value: unknown) => string,
+  ): string {
     return `${this.constructor.name} ${
       inspect({ "#bodyInit": this.#bodyInit, "#closed": this.#closed })
     }`;
@@ -389,7 +391,8 @@ export class ServerSentEventStreamTarget extends EventTarget
     // deno-lint-ignore no-explicit-any
     options: any,
     inspect: (value: unknown, options?: unknown) => string,
-  ) {
+    // deno-lint-ignore no-explicit-any
+  ): any {
     if (depth < 0) {
       return options.stylize(`[${this.constructor.name}]`, "special");
     }

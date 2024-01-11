@@ -1,4 +1,12 @@
 {
+  "name": "@oak/commons",
+  "version": "0.4.0",
+  "exports": {
+    "./http_errors": "./http_errors.ts",
+    "./method": "./method.ts",
+    "./server_sent_event": "./server_sent_event.ts",
+    "./status": "./status.ts"
+  },
   "lock": false,
   "fmt": {
     "exclude": ["README.md"]
