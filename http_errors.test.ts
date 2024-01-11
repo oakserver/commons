@@ -1,8 +1,9 @@
 // Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
 
-import { assertInstanceOf } from "./deps_test.ts";
+import { assert } from "./deps.ts";
+import { assertEquals, assertInstanceOf } from "./deps_test.ts";
 
-import { type ErrorStatus, Status } from "./status.ts";
+import { type ErrorStatus, Status, STATUS_TEXT } from "./status.ts";
 
 import {
   createHttpError,
@@ -61,8 +62,22 @@ Deno.test({
   fn() {
     for (const errorStatus of clientErrorStatus) {
       const error = createHttpError(errorStatus);
+      const errorExpose = createHttpError(
+        errorStatus,
+        STATUS_TEXT[errorStatus],
+        {
+          expose: false,
+          headers: new Headers({ "WWW-Authenticate": "Bearer" }),
+        },
+      );
       assertInstanceOf(error, HttpError);
       assertInstanceOf(error, errors[Status[errorStatus] as ErrorStatusKeys]);
+      assertEquals(error.name, `${Status[errorStatus]}Error`);
+      assertEquals(error.message, STATUS_TEXT[errorStatus]);
+      assertEquals(errorExpose.status, errorStatus);
+      assertEquals(errorExpose.headers?.get("WWW-Authenticate"), "Bearer");
+      assert(error.expose);
+      assert(!errorExpose.expose);
     }
   },
 });
@@ -72,8 +87,21 @@ Deno.test({
   fn() {
     for (const errorStatus of serverErrorStatus) {
       const error = createHttpError(errorStatus);
+      const errorExpose = createHttpError(
+        errorStatus,
+        STATUS_TEXT[errorStatus],
+        {
+          expose: true,
+        },
+      );
       assertInstanceOf(error, HttpError);
       assertInstanceOf(error, errors[Status[errorStatus] as ErrorStatusKeys]);
+      assertEquals(error.name, `${Status[errorStatus]}Error`);
+      assertEquals(error.message, STATUS_TEXT[errorStatus]);
+      assertEquals(error.status, errorStatus);
+      assert(!error.expose);
+      assert(errorExpose.expose);
+      assert(!error.headers);
     }
   },
 });

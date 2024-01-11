@@ -1,6 +1,7 @@
-// Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
+// Copyright 2018-2024 the oak authors. All rights reserved. MIT license.
 
-/** A collection of HTTP errors and utilities.
+/**
+ * A collection of HTTP errors and utilities.
  *
  * The export {@linkcode errors} contains an individual class that extends
  * {@linkcode HttpError} which makes handling HTTP errors in a structured way.
@@ -10,6 +11,37 @@
  *
  * The function {@linkcode isHttpError} is a type guard that will narrow a value
  * to an `HttpError` instance.
+ *
+ * @example
+ * ```ts
+ * import { errors, isHttpError } from "https://deno.land/std@$STD_VERSION/http/http_errors.ts";
+ *
+ * try {
+ *   throw new errors.NotFound();
+ * } catch (e) {
+ *   if (isHttpError(e)) {
+ *     const response = new Response(e.message, { status: e.status });
+ *   } else {
+ *     throw e;
+ *   }
+ * }
+ * ```
+ *
+ * @example
+ * ```ts
+ * import { createHttpError } from "https://deno.land/std@$STD_VERSION/http/http_errors.ts";
+ * import { Status } from "https://deno.land/std@$STD_VERSION/http/status.ts";
+ *
+ * try {
+ *   throw createHttpError(
+ *     Status.BadRequest,
+ *     "The request was bad.",
+ *     { expose: false }
+ *   );
+ * } catch (e) {
+ *   // handle errors
+ * }
+ * ```
  *
  * @module
  */
@@ -65,29 +97,57 @@ const ERROR_STATUS_MAP = {
 
 export type ErrorStatusKeys = keyof typeof ERROR_STATUS_MAP;
 
-/** The base class that all derivative HTTP extend, providing a `status` and an
- * `expose` property. */
+export interface HttpErrorOptions extends ErrorOptions {
+  expose?: boolean;
+  headers?: HeadersInit;
+}
+
+/**
+ * The base class that all derivative HTTP extend, providing a `status` and an
+ * `expose` property.
+ */
 export class HttpError extends Error {
+  #status: ErrorStatus = Status.InternalServerError;
+  #expose: boolean;
+  #headers?: Headers;
+  constructor(
+    message = "Http Error",
+    options?: HttpErrorOptions,
+  ) {
+    super(message, options);
+    this.#expose = options?.expose === undefined
+      ? isClientErrorStatus(this.status)
+      : options.expose;
+    if (options?.headers) {
+      this.#headers = new Headers(options.headers);
+    }
+  }
+
   /** A flag to indicate if the internals of the error, like the stack, should
    * be exposed to a client, or if they are "private" and should not be leaked.
-   * By default, all client errors are `true` and all server errors are `false`.
-   */
+   * By default, all client errors are `true` and all server errors are
+   * `false`. */
   get expose(): boolean {
-    return false;
+    return this.#expose;
+  }
+  /** The optional headers object that is set on the error. */
+  get headers(): Headers | undefined {
+    return this.#headers;
   }
   /** The error status that is set on the error. */
   get status(): ErrorStatus {
-    return Status.InternalServerError;
+    return this.#status;
   }
 }
 
-function createHttpErrorConstructor(status: ErrorStatus) {
+function createHttpErrorConstructor(status: ErrorStatus): typeof HttpError {
   const name = `${Status[status]}Error`;
   const ErrorCtor = class extends HttpError {
-    #expose = isClientErrorStatus(status);
-
-    constructor(message = STATUS_TEXT[status]) {
-      super(message);
+    constructor(
+      message = STATUS_TEXT[status],
+      options?: HttpErrorOptions,
+    ) {
+      super(message, options);
       Object.defineProperty(this, "name", {
         configurable: true,
         enumerable: false,
@@ -96,34 +156,55 @@ function createHttpErrorConstructor(status: ErrorStatus) {
       });
     }
 
-    get expose() {
-      return this.#expose;
-    }
-
-    get status() {
+    override get status() {
       return status;
     }
   };
   return ErrorCtor;
 }
 
-/** A map of HttpErrors that are unique instances for each HTTP error status
- * code. */
-export const errors = {} as Record<ErrorStatusKeys, typeof HttpError>;
+/**
+ * A namespace that contains each error constructor. Each error extends
+ * `HTTPError` and provides `.status` and `.expose` properties, where the
+ * `.status` will be an error `Status` value and `.expose` indicates if
+ * information, like a stack trace, should be shared in the response.
+ *
+ * By default, `.expose` is set to false in server errors, and true for client
+ * errors.
+ *
+ * @example
+ * ```ts
+ * import { errors } from "https://deno.land/std@$STD_VERSION/http/http_errors.ts";
+ *
+ * throw new errors.InternalServerError("Ooops!");
+ * ```
+ */
+export const errors: Record<ErrorStatusKeys, typeof HttpError> = {} as Record<
+  ErrorStatusKeys,
+  typeof HttpError
+>;
 
 for (const [key, value] of Object.entries(ERROR_STATUS_MAP)) {
   errors[key as ErrorStatusKeys] = createHttpErrorConstructor(value);
 }
 
-/** Create an instance of an HttpError based on the status code provided. */
+/**
+ * A factory function which provides a way to create errors. It takes up to 3
+ * arguments, the error `Status`, an message, which defaults to the status text
+ * and error options, which includes the `expose` property to set the `.expose`
+ * value on the error.
+ */
 export function createHttpError(
-  status: ErrorStatus = 500,
+  status: ErrorStatus = Status.InternalServerError,
   message?: string,
+  options?: HttpErrorOptions,
 ): HttpError {
-  return new errors[Status[status] as ErrorStatusKeys](message);
+  return new errors[Status[status] as ErrorStatusKeys](message, options);
 }
 
-/** A type guard that determines if the value is an HttpError or not. */
+/**
+ * A type guard that determines if the value is an HttpError or not.
+ */
 export function isHttpError(value: unknown): value is HttpError {
   return value instanceof HttpError;
 }

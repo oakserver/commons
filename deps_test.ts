@@ -7,8 +7,7 @@
  */
 
 export {
-  assert,
   assertEquals,
-  assertInstanceOf,
-  assertRejects,
-} from "https://deno.land/std@0.138.0/testing/asserts.ts";
+} from "https://deno.land/std@0.211.0/assert/assert_equals.ts";
+export { assertInstanceOf } from "https://deno.land/std@0.211.0/assert/assert_instance_of.ts";
+export { assertRejects } from "https://deno.land/std@0.211.0/assert/assert_rejects.ts";
