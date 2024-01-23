@@ -23,6 +23,8 @@ The
 [inline documentation](https://doc.deno.land/https://deno.land/x/oak_commons)
 for each modules is the best guide on the usage of the APIs:
 
+- [/cookie_map.ts](https://doc.deno.land/https://deno.land/x/oak_commons/cookie_map.ts) -
+  an API for managing signed and unsigned cookies server side.
 - [/http_errors.ts](https://doc.deno.land/https://deno.land/x/oak_commons/http_errors.ts) -
   utilities for working with HTTP Error status as JavaScript errors.
 - [/method.ts](https://doc.deno.land/https://deno.land/x/oak_commons/method.ts) -
