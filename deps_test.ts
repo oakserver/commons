@@ -6,14 +6,10 @@
  * @module
  */
 
-export {
-  assertEquals,
-} from "https://deno.land/std@0.215.0/assert/assert_equals.ts";
-export { assertInstanceOf } from "https://deno.land/std@0.215.0/assert/assert_instance_of.ts";
-export { assertRejects } from "https://deno.land/std@0.215.0/assert/assert_rejects.ts";
-export {
-  assertStrictEquals,
-} from "https://deno.land/std@0.215.0/assert/assert_strict_equals.ts";
-export { assertThrows } from "https://deno.land/std@0.215.0/assert/assert_throws.ts";
-export { FakeTime } from "https://deno.land/std@0.215.0/testing/time.ts";
-export { KeyStack } from "https://deno.land/std@0.215.0/crypto/unstable_keystack.ts";
+export { assertEquals } from "jsr:@std/assert@0.215/assert_equals";
+export { assertInstanceOf } from "jsr:@std/assert@0.215/assert_instance_of";
+export { assertRejects } from "jsr:@std/assert@0.215/assert_rejects";
+export { assertStrictEquals } from "jsr:@std/assert@0.215/assert_strict_equals";
+export { assertThrows } from "jsr:@std/assert@0.215/assert_throws";
+export { FakeTime } from "jsr:@std/testing@0.215/time";
+export { KeyStack } from "jsr:@std/crypto@0.215/unstable_keystack";
