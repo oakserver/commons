@@ -306,7 +306,7 @@ class Cookie implements CookieAttributes {
  * headers.
  */
 export const cookieMapHeadersInitSymbol: unique symbol = Symbol.for(
-  "Deno.std.cookieMap.headersInit",
+  "oak.commons.cookieMap.headersInit",
 );
 
 function isMergeable(value: unknown): value is Mergeable {

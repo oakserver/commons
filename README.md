@@ -1,7 +1,7 @@
 # oak commons
 
+[![deno.land/x/oak_commons](https://deno.land/badge/oak_commons/version)](https://deno.land/x/oak_commons)
 [![oak_commons ci](https://github.com/oakserver/commons/workflows/ci/badge.svg)](https://github.com/oakserver/commons)
-[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/oak_commons)
 
 A set of APIs that are common to HTTP/HTTPS servers.
 
@@ -20,18 +20,20 @@ The [acorn](https://deno.land/x/acorn) (a RESTful services framework) and
 `oak_commons`.
 
 The
-[inline documentation](https://doc.deno.land/https://deno.land/x/oak_commons)
+[inline documentation](https://deno.land/x/oak_commons?doc)
 for each modules is the best guide on the usage of the APIs:
 
-- [/cookie_map.ts](https://doc.deno.land/https://deno.land/x/oak_commons/cookie_map.ts) -
+- [/cookie_map.ts](https://deno.land/x/oak_commons/cookie_map.ts) -
   an API for managing signed and unsigned cookies server side.
-- [/http_errors.ts](https://doc.deno.land/https://deno.land/x/oak_commons/http_errors.ts) -
+- [/http_errors.ts](https://deno.land/x/oak_commons/http_errors.ts) -
   utilities for working with HTTP Error status as JavaScript errors.
-- [/method.ts](https://doc.deno.land/https://deno.land/x/oak_commons/method.ts) -
+- [/media_types.ts](https://deno.land/x/oak_commons/media_types.ts) - utilities
+  for working with media types from a request.
+- [/method.ts](https://deno.land/x/oak_commons/method.ts) -
   utilities for working with HTTP methods/verbs in a type safe way.
-- [/server_sent_event.ts](https://doc.deno.land/https://deno.land/x/oak_commons/method.ts) -
+- [/server_sent_event.ts](https://deno.land/x/oak_commons/method.ts) -
   an abstraction for managing server sent events like DOM events.
-- [/status.ts](https://doc.deno.land/https://deno.land/x/oak_commons/status.ts) -
+- [/status.ts](https://deno.land/x/oak_commons/status.ts) -
   utilities for working with HTTP statuses in a type safe way.
 
 ---
