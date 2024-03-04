@@ -143,7 +143,7 @@ export class MediaType {
   }
 
   /** Return the parsed media type in its valid string format. */
-  toString() {
+  toString(): string {
     return this.#suffix
       ? `${this.#type}/${this.#subtype}+${this.#suffix}`
       : `${this.#type}/${this.#subtype}`;

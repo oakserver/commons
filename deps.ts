@@ -1,5 +1,5 @@
 // Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
 
-export { assert } from "https://deno.land/std@0.215.0/assert/assert.ts";
-export * as base64 from "https://deno.land/std@0.215.0/encoding/base64.ts";
-export { typeByExtension } from "https://deno.land/std@0.215.0/media_types/type_by_extension.ts";
+export { assert } from "jsr:@std/assert@0.215/assert";
+export * as base64 from "jsr:@std/encoding@0.215/base64";
+export { typeByExtension } from "jsr:@std/media-types@0.215/type_by_extension";
