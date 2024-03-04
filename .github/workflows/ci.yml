@@ -4,33 +4,21 @@ on: [push, pull_request]
 
 jobs:
   deno:
-    name: oak-commons-${{ matrix.os }}
-    if: |
-      github.event_name == 'push' ||
-      !startsWith(github.event.pull_request.head.label, 'oakserver:')
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-
-    env:
-      GH_ACTIONS: 1
-
+    runs-on: ubuntu-latest
     steps:
-      - name: ☑️ clone repository
-        uses: actions/checkout@v2
+      - name: clone repository
+        uses: actions/checkout@v4
 
-      - name: ➡️  install Deno
-        uses: denoland/setup-deno@v1.0.0
+      - name: install Deno
+        uses: denoland/setup-deno@v1
         with:
           deno-version: 1.x
 
-      - name: 💄  format
+      - name: format
         run: deno fmt --check
 
-      - name: 💄  lint
+      - name: lint
         run: deno lint
 
-      - name: 🧪  test
+      - name: test
         run: deno test
