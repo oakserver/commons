@@ -1,7 +1,8 @@
 # oak commons
 
+[![jsr.io/@oak/commons](https://jsr.io/badges/@oak/commons)](https://jsr.io/@oak/commons)
+[![jsr.io/@oak/commons score](https://jsr.io/badges/@oak/commons/score)](https://jsr.io/@oak/commons)
 [![deno.land/x/oak_commons](https://deno.land/badge/oak_commons/version)](https://deno.land/x/oak_commons)
-[![oak_commons ci](https://github.com/oakserver/commons/workflows/ci/badge.svg)](https://github.com/oakserver/commons)
 
 A set of APIs that are common to HTTP/HTTPS servers.
 
@@ -16,25 +17,40 @@ shared dependencies as reasonable. These modules are designed as building blocks
 for more complex HTTP/HTTPS and server frameworks.
 
 The [acorn](https://deno.land/x/acorn) (a RESTful services framework) and
-[oak](https://deno.land/x/oak) are examples of something built on top of
-`oak_commons`.
+[oak](https://jsr.io/@oak/oak) are examples of something built on top of
+oak commons.
+
+## Usage
+
+Each module/export is designed to be as independent as possible and there is no
+top level export, so each area of functionality needs to be imported. For
+example, to use `status` would look something like this:
+
+```ts
+import { STATUS_CODE, STATUS_TEXT } from "jsr:@oak/commons/status";
+
+console.log(STATUS_CODE.NotFound); // Returns 404
+console.log(STATUS_TEXT[STATUS_CODE.NotFound]); // Returns "Not Found"
+```
+
+## Documentation
 
 The
-[inline documentation](https://deno.land/x/oak_commons?doc)
+[inline documentation](https://jsr.io/@oak/commons)
 for each modules is the best guide on the usage of the APIs:
 
-- [/cookie_map.ts](https://deno.land/x/oak_commons/cookie_map.ts) -
-  an API for managing signed and unsigned cookies server side.
-- [/http_errors.ts](https://deno.land/x/oak_commons/http_errors.ts) -
-  utilities for working with HTTP Error status as JavaScript errors.
-- [/media_types.ts](https://deno.land/x/oak_commons/media_types.ts) - utilities
+- [/cookie_map.ts](https://jsr.io/@oak/commons/doc/cookie_map/~) - an API for
+  managing signed and unsigned cookies server side.
+- [/http_errors.ts](https://jsr.io/@oak/commons/doc/http_errors/~) - utilities
+  for working with HTTP Error status as JavaScript errors.
+- [/media_types.ts](https://jsr.io/@oak/commons/doc/media_types/~) - utilities
   for working with media types from a request.
-- [/method.ts](https://deno.land/x/oak_commons/method.ts) -
-  utilities for working with HTTP methods/verbs in a type safe way.
-- [/server_sent_event.ts](https://deno.land/x/oak_commons/method.ts) -
+- [/method.ts](https://jsr.io/@oak/commons/doc/method/~) - utilities for working
+  with HTTP methods/verbs in a type safe way.
+- [/server_sent_event.ts](https://jsr.io/@oak/commons/doc/server_sent_event/~) -
   an abstraction for managing server sent events like DOM events.
-- [/status.ts](https://deno.land/x/oak_commons/status.ts) -
-  utilities for working with HTTP statuses in a type safe way.
+- [/status.ts](https://jsr.io/@oak/commons/doc/status/~) - utilities for working
+  with HTTP statuses in a type safe way.
 
 ---
 

@@ -5,6 +5,13 @@
  * {@linkcode HttpMethod} and the type guard {@linkcode isHttpMethod} for
  * working with HTTP methods with type safety.
  *
+ * @example
+ * ```ts
+ * import { isHttpMethod } from "jsr:@oak/commons/method";
+ *
+ * console.log(isMethod("GET")); // true
+ * ```
+ *
  * @module
  */
 

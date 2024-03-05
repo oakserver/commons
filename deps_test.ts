@@ -6,6 +6,7 @@
  * @module
  */
 
+export { assert } from "jsr:@std/assert@0.218/assert";
 export { assertEquals } from "jsr:@std/assert@0.218/assert_equals";
 export { assertInstanceOf } from "jsr:@std/assert@0.218/assert_instance_of";
 export { assertRejects } from "jsr:@std/assert@0.218/assert_rejects";

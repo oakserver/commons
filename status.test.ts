@@ -1,5 +1,7 @@
 // Copyright 2018-2024 the oak authors. All rights reserved. MIT license.
 
+import { assert, assertEquals } from "./deps_test.ts";
+
 import {
   isClientErrorStatus,
   isErrorStatus,
@@ -10,8 +12,6 @@ import {
   STATUS_CODE,
   STATUS_TEXT,
 } from "./status.ts";
-import { assert } from "./deps.ts";
-import { assertEquals } from "./deps_test.ts";
 
 Deno.test({
   name: "http/http_status - Status",

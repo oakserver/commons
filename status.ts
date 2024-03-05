@@ -9,7 +9,7 @@
  * import {
  *   STATUS_CODE,
  *   STATUS_TEXT,
- * } from "https://deno.land/std@$STD_VERSION/http/status.ts";
+ * } from "jsr:@oak/commons/status";
  *
  * console.log(STATUS_CODE.NotFound); // Returns 404
  * console.log(STATUS_TEXT[STATUS_CODE.NotFound]); // Returns "Not Found"
@@ -17,7 +17,7 @@
  *
  * @example
  * ```ts
- * import { isErrorStatus } from "https://deno.land/std@$STD_VERSION/http/status.ts";
+ * import { isErrorStatus } from "jsr:@oak/commons/status";
  *
  * const res = await fetch("https://example.com/");
  *
@@ -163,6 +163,9 @@ export enum Status {
   NetworkAuthenticationRequired = 511,
 }
 
+/**
+ * A constant hash of all the standard HTTP status codes.
+ */
 export const STATUS_CODE = {
   /** RFC 7231, 6.2.1 */
   Continue: 100,
@@ -296,7 +299,9 @@ export const STATUS_CODE = {
 
 export type StatusCode = typeof STATUS_CODE[keyof typeof STATUS_CODE];
 
-/** A record of all the status codes text. */
+/**
+ * A record of all the status codes text.
+ */
 export const STATUS_TEXT = {
   [STATUS_CODE.Accepted]: "Accepted",
   [STATUS_CODE.AlreadyReported]: "Already Reported",
@@ -363,6 +368,10 @@ export const STATUS_TEXT = {
   [STATUS_CODE.VariantAlsoNegotiates]: "Variant Also Negotiates",
 } as const;
 
+/**
+ * A type alias which is a set of string literal types of all the status text
+ * values.
+ */
 export type StatusText = typeof STATUS_TEXT[keyof typeof STATUS_TEXT];
 
 /** An HTTP status that is a informational (1XX). */
@@ -443,6 +452,9 @@ export type ServerErrorStatus =
 /** An HTTP status that is an error (4XX and 5XX). */
 export type ErrorStatus = ClientErrorStatus | ServerErrorStatus;
 
+/**
+ * A type guard that determines if the value is a valid {@linkcode StatusCode}.
+ */
 export function isStatus(status: number): status is StatusCode {
   return Object.values(STATUS_CODE).includes(status as StatusCode);
 }

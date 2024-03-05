@@ -1,7 +1,6 @@
 // Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
 
-import { assert } from "./deps.ts";
-import { assertEquals, assertInstanceOf } from "./deps_test.ts";
+import { assert, assertEquals, assertInstanceOf } from "./deps_test.ts";
 
 import { type ErrorStatus, Status, STATUS_TEXT } from "./status.ts";
 

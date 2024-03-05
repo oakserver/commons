@@ -1,7 +1,7 @@
 // Copyright 2018-2024 the oak authors. All rights reserved. MIT license.
 
-import { assert } from "./deps.ts";
 import {
+  assert,
   assertEquals,
   assertRejects,
   assertThrows,

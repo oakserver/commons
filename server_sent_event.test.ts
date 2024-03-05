@@ -1,7 +1,6 @@
 // Copyright 2018-2024 the oak authors. All rights reserved. MIT license.
 
-import { assert } from "./deps.ts";
-import { assertEquals } from "./deps_test.ts";
+import { assert, assertEquals } from "./deps_test.ts";
 import {
   ServerSentEvent,
   ServerSentEventStreamTarget,

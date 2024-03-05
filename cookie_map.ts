@@ -8,10 +8,7 @@
  * a response:
  *
  * ```ts
- * import {
- *   CookieMap,
- *   mergeHeaders
- * } from "https://deno.land/std@$STD_VERSION/http/unstable_cookie_map.ts";
+ * import { CookieMap, mergeHeaders } from "jsr:@oak/commons/cookie_map";
  *
  * const request = new Request("https://localhost/", {
  *   headers: { "cookie": "foo=bar; bar=baz;"}
@@ -39,7 +36,7 @@
  *   SecureCookieMap,
  *   mergeHeaders,
  *   type KeyRing,
- * } from "https://deno.land/std@$STD_VERSION/http/unstable_cookie_map.ts";
+ * } from "jsr:@oak/commons/cookie_map";
  *
  * const request = new Request("https://localhost/", {
  *   headers: { "cookie": "foo=bar; bar=baz;"}
@@ -65,7 +62,7 @@
  * set cookies will be added directly to those headers:
  *
  * ```ts
- * import { CookieMap } from "https://deno.land/std@$STD_VERSION/http/unstable_cookie_map.ts";
+ * import { CookieMap } from "jsr:@oak/commons/cookie_map";
  *
  * const request = new Request("https://localhost/", {
  *   headers: { "cookie": "foo=bar; bar=baz;"}
@@ -132,10 +129,15 @@ export interface Headered {
   headers: Headers;
 }
 
+/**
+ * An object which contains a symbol which indicates that it can be merged with
+ * other headers.
+ */
 export interface Mergeable {
   [cookieMapHeadersInitSymbol](): [string, string][];
 }
 
+/** Options which can be set when initializing a {@linkcode SecureCookieMap}. */
 export interface SecureCookieMapOptions {
   /** Keys which will be used to validate and sign cookies. The key ring should
    * implement the {@linkcode KeyRing} interface. */
@@ -159,11 +161,19 @@ export interface SecureCookieMapOptions {
   secure?: boolean;
 }
 
+/**
+ * Options which can be set when calling the `.get()` method on a
+ * {@linkcode SecureCookieMap}.
+ */
 export interface SecureCookieMapGetOptions {
   /** Overrides the flag that was set when the instance was created. */
   signed?: boolean;
 }
 
+/**
+ * Options which can be set when calling the `.set()` or `.delete()` method on a
+ * {@linkcode SecureCookieMap}.
+ */
 export interface SecureCookieMapSetDeleteOptions {
   /** The domain to scope the cookie for. */
   domain?: string;

@@ -19,7 +19,7 @@
  * import {
  *   ServerSentEvent,
  *   ServerSentEventStreamTarget,
- * } from "https://deno.land/std@$STD_VERSION/http/unstable_server_sent_event.ts";
+ * } from "jsr:@oak/commons/server_sent_event";
  *
  * Deno.serve({ port: 8000 }, (request) => {
  *   const target = new ServerSentEventStreamTarget();
@@ -42,12 +42,13 @@
  * @module
  */
 
-import { assert } from "./deps.ts";
+import { assert } from "jsr:@std/assert@0.218/assert";
 
 const encoder = new TextEncoder();
 
 const DEFAULT_KEEP_ALIVE_INTERVAL = 30_000;
 
+/** Options which can be set when initializing a {@linkcode ServerSentEvent}. */
 export interface ServerSentEventInit extends EventInit {
   /** Optional arbitrary data to send to the client, data this is a string will
    * be sent unmodified, otherwise `JSON.parse()` will be used to serialize the
@@ -70,6 +71,10 @@ export interface ServerSentEventInit extends EventInit {
   space?: string | number;
 }
 
+/**
+ * Options which can be sent when initializing a
+ * {@linkcode ServerSentEventTarget}.
+ */
 export interface ServerSentEventTargetOptions {
   /** Keep client connections alive by sending a comment event to the client
    * at a specified interval.  If `true`, then it polls every 30000 milliseconds
@@ -99,7 +104,7 @@ class CloseEvent extends Event {
  * import {
  *   ServerSentEvent,
  *   ServerSentEventStreamTarget,
- * } from "https://deno.land/std@$STD_VERSION/http/server_sent_event.ts";
+ * } from "jsr:@oak/commons/server_sent_event";
  *
  * Deno.serve({ port: 8000 }, (request) => {
  *   const target = new ServerSentEventStreamTarget();
@@ -170,6 +175,10 @@ const RESPONSE_HEADERS = [
   ["Keep-Alive", `timeout=${Number.MAX_SAFE_INTEGER}`],
 ] as const;
 
+/**
+ * The abstract interface for server sent events, which is implemented in
+ * {@linkcode ServerSentEventStreamTarget}.
+ */
 export interface ServerSentEventTarget extends EventTarget {
   /** Is set to `true` if events cannot be sent to the remote connection.
    * Otherwise it is set to `false`.
@@ -186,7 +195,7 @@ export interface ServerSentEventTarget extends EventTarget {
    * connection is kept alive.
    *
    * ```ts
-   * import { ServerSentEventStreamTarget } from "https://deno.land/std@$STD_VERSION/http/server_sent_event.ts";
+   * import { ServerSentEventStreamTarget } from "jsr:@oak/commons/server_sent_event";
    *
    * Deno.serve({ port: 8000 }, (request) => {
    *   const target = new ServerSentEventStreamTarget();
@@ -213,7 +222,7 @@ export interface ServerSentEventTarget extends EventTarget {
    * import {
    *   ServerSentEvent,
    *   ServerSentEventStreamTarget,
-   * } from "https://deno.land/std@$STD_VERSION/http/server_sent_event.ts";
+   * } from "jsr:@oak/commons/server_sent_event";
    *
    * Deno.serve({ port: 8000 }, (request) => {
    *   const target = new ServerSentEventStreamTarget();
@@ -236,7 +245,7 @@ export interface ServerSentEventTarget extends EventTarget {
    * import {
    *   ServerSentEvent,
    *   ServerSentEventStreamTarget,
-   * } from "https://deno.land/std@$STD_VERSION/http/server_sent_event.ts";
+   * } from "jsr:@oak/commons/server_sent_event";
    *
    * Deno.serve({ port: 8000 }, (request) => {
    *   const target = new ServerSentEventStreamTarget();

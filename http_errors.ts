@@ -14,7 +14,7 @@
  *
  * @example
  * ```ts
- * import { errors, isHttpError } from "https://deno.land/std@$STD_VERSION/http/http_errors.ts";
+ * import { errors, isHttpError } from "jsr:@oak/commons/http_errors";
  *
  * try {
  *   throw new errors.NotFound();
@@ -29,8 +29,8 @@
  *
  * @example
  * ```ts
- * import { createHttpError } from "https://deno.land/std@$STD_VERSION/http/http_errors.ts";
- * import { Status } from "https://deno.land/std@$STD_VERSION/http/status.ts";
+ * import { createHttpError } from "jsr:@oak/commons/http_errors";
+ * import { Status } from "jsr:@oak/commons/status";
  *
  * try {
  *   throw createHttpError(
@@ -95,10 +95,19 @@ const ERROR_STATUS_MAP = {
   "NetworkAuthenticationRequired": 511,
 } as const;
 
+/**
+ * A type alias which is a set of all the string literal names of the error
+ * status codes.
+ */
 export type ErrorStatusKeys = keyof typeof ERROR_STATUS_MAP;
 
+/**
+ * Options which can be set when initializing an {@linkcode HttpError}
+ */
 export interface HttpErrorOptions extends ErrorOptions {
+  /** Determine if the underlying error stack should be exposed to a client. */
   expose?: boolean;
+  /** Any headers that should be set when returning the error as a response. */
   headers?: HeadersInit;
 }
 
@@ -174,7 +183,7 @@ function createHttpErrorConstructor(status: ErrorStatus): typeof HttpError {
  *
  * @example
  * ```ts
- * import { errors } from "https://deno.land/std@$STD_VERSION/http/http_errors.ts";
+ * import { errors } from "jsr:@oak/commons/http_errors";
  *
  * throw new errors.InternalServerError("Ooops!");
  * ```
