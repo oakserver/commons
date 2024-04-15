@@ -1,5 +1,9 @@
 # @oak/commons Change Log
 
+## Version 0.8.1
+
+- chore: export range from package (dd3d78c)
+
 ## Version 0.8.0
 
 - feat: add range APIs (898140a)
