@@ -9,6 +9,20 @@
     "./server_sent_event": "./server_sent_event.ts",
     "./status": "./status.ts"
   },
+  "publish": {
+    "exclude": [
+      "*.test.ts",
+      "*.bench.ts",
+      "_fixtures",
+      ".github",
+      ".vscode",
+      "deps_test.ts"
+    ]
+  },
+  "tasks": {
+    "bench": "deno bench --allow-read",
+    "test": "deno test --allow-read"
+  },
   "lock": false,
   "fmt": {
     "exclude": ["README.md"]
