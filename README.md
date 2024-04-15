@@ -7,9 +7,9 @@
 A set of APIs that are common to HTTP/HTTPS servers.
 
 > [!NOTE]
-> Originally all this code was contributed to the Deno standard library but the
-> maintainers after accepting the contributions have moved to remove this code,
-> so I had to resurrect this library to be able to provide common HTTP
+> Originally most of this code was contributed to the Deno standard library but
+> the maintainers after accepting the contributions have moved to remove this
+> code, so I had to resurrect this library to be able to provide common HTTP
 > functionality.
 
 Each module is designed to be largely independent of other modules, with as few
@@ -47,6 +47,8 @@ for each modules is the best guide on the usage of the APIs:
   for working with media types from a request.
 - [/method.ts](https://jsr.io/@oak/commons/doc/method/~) - utilities for working
   with HTTP methods/verbs in a type safe way.
+- [/range.ts](https://jsr.io/@oak/commons/doc/range/~) - utilities for
+  supporting range requests.
 - [/server_sent_event.ts](https://jsr.io/@oak/commons/doc/server_sent_event/~) -
   an abstraction for managing server sent events like DOM events.
 - [/status.ts](https://jsr.io/@oak/commons/doc/status/~) - utilities for working
