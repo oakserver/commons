@@ -42,7 +42,7 @@
  * @module
  */
 
-import { assert } from "jsr:@std/assert@0.218/assert";
+import { assert } from "jsr:@std/assert@0.222/assert";
 
 const encoder = new TextEncoder();
 
