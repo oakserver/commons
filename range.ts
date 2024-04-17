@@ -13,10 +13,15 @@
  * There are also some lower level constructs which can be used for advanced
  * use cases.
  *
+ *   - {@linkcode MultiPartByteRangesStream} is a readable stream which
+ *     generates a body that converts the source to a multipart byte range
+ *     document.
  *   - {@linkcode RangeByteTransformStream} is a transform stream which will
  *     only stream the bytes indicated by the range.
  *   - {@linkcode contentRange} sets the headers that are appropriate when
  *     sending a range content response.
+ *   - {@linkcode multiPartByteRanges} sets the headers that are appropriate
+ *     when sending a multi part byte range content response.
  *   - {@linkcode asLimitedReadableStream} leverages the `.seek()` APIs with a
  *     {@linkcode Deno.FsFile} to provide a more performant and memory efficient
  *     way to stream just a range of bytes form a file.
@@ -32,11 +37,7 @@
  *   const url = new URL(req.url);
  *   const file = await Deno.open(`./static${url.pathname}`);
  *   const fileInfo = await file.stat();
- *   const headers = {
- *     "content-type": typeByExtension(extname(url.pathname)) ??
- *       "application/octet-stream",
- *     "accept-ranges": "bytes",
- *   };
+ *   const headers = { "accept-ranges": "bytes", "content-type": type };
  *   if (req.method === "HEAD") {
  *     return new Response(null, {
  *       headers: {
@@ -49,9 +50,9 @@
  *     const result = await range(req, fileInfo);
  *     if (result.ok) {
  *       if (result.ranges) {
- *         return responseRange(file, fileInfo.size, result.ranges[0], {
+ *         return responseRange(file, fileInfo.size, result.ranges, {
  *           headers,
- *         });
+ *         }, { type });
  *       } else {
  *         return new Response(file.readable, {
  *           headers: {
@@ -76,6 +77,7 @@
  */
 
 import { assert } from "jsr:/@std/assert@0.222/assert";
+import { concat } from "jsr:/@std/bytes@0.222/concat";
 import {
   calculate,
   type Entity,
@@ -91,6 +93,29 @@ export interface ByteRange {
   start: number;
   /** The last byte to be included in the range. The number is zero indexed. */
   end: number;
+}
+
+/**
+ * Options which can be used when creating a
+ * {@linkcode MultiPartByteRangesStream}.
+ */
+interface MultiPartByteRangeStreamOptions {
+  /**
+   * If the source is a {@linkcode Deno.FsFile}, close the file once the ranges
+   * have been read from the file. This defaults to `true`.
+   */
+  autoClose?: boolean;
+  /**
+   * The boundary that should be used when creating parts of the response. A
+   * default one is used if none is supplied.
+   */
+  boundary?: string;
+  /**
+   * A content type to be used with the parts of the response. If one is not
+   * supplied and the source is a {@linkcode Blob}, the blob's `.type` will be
+   * used, otherwise `"application/octet-stream"`.
+   */
+  type?: string;
 }
 
 /**
@@ -115,8 +140,10 @@ export type RangeResult = {
   ranges: null;
 };
 
-/** Options which can be set with {@linkcode responseRange} or
- * {@linkcode asLimitedReadableStream}. */
+/**
+ * Options which can be set with {@linkcode responseRange} or
+ * {@linkcode asLimitedReadableStream}.
+ */
 export interface ResponseRangeOptions {
   /**
    * Once the stream or body is finished being read, close the source
@@ -126,10 +153,20 @@ export interface ResponseRangeOptions {
    */
   autoClose?: boolean;
   /**
+   * When handling multiple ranges and sending a multiple response, override
+   * the default boundary.
+   */
+  boundary?: string;
+  /**
    * The size of which chunks are attempted to be read. This defaults to 512k.
    * The value is specified in number of bytes.
    */
   chunkSize?: number;
+  /**
+   * Provide a content type for the response. This will override any automatic
+   * determination of the type.
+   */
+  type?: string;
 }
 
 const DEFAULT_CHUNK_SIZE = 524_288;
@@ -153,6 +190,183 @@ function isModified(value: string, mtime: Date): boolean {
   // adjust to the precision of HTTP UTC time
   b -= b % 1000;
   return a < b;
+}
+
+async function readRange(
+  file: Deno.FsFile,
+  { start, end }: ByteRange,
+): Promise<Uint8Array> {
+  const parts: Uint8Array[] = [];
+  let read = 0;
+  const length = end - start + 1;
+  const pos = await file.seek(start, Deno.SeekMode.Start);
+  if (pos !== start) {
+    throw new RangeError("Could not seek to range start.");
+  }
+  while (read < length) {
+    const chunk = new Uint8Array(length - read);
+    const count = await file.read(chunk);
+    if (count === null) {
+      throw new RangeError("Could not read to range end.");
+    }
+    parts.push(chunk);
+    read += count;
+  }
+  return parts.length > 1 ? concat(parts) : parts[0];
+}
+
+/**
+ * A readable stream that will stream a body formatted as a
+ * `multipart/byteranges` document. The `source` needs to be a
+ * {@linkcode Deno.FsFile}, {@linkcode ReadableStream}, {@linkcode Blob},
+ * {@linkcode BufferSource}, or a `string`.
+ */
+export class MultiPartByteRangesStream extends ReadableStream<Uint8Array> {
+  #boundary: string;
+  #contentLength: number;
+  #postscript: Uint8Array;
+  #previous: Uint8Array | undefined;
+  #ranges: ByteRange[];
+  #seen = 0;
+  #source:
+    | ArrayBuffer
+    | Blob
+    | ReadableStreamDefaultReader<Uint8Array>
+    | Deno.FsFile;
+  #type: string;
+
+  /**
+   * The boundary being used when segmenting different parts of the body
+   * response. This should be reflected in the `Content-Type` header when
+   * being sent to a client.
+   */
+  get boundary(): string {
+    return this.#boundary;
+  }
+
+  /**
+   * The length of the content being supplied by the stream. This should be
+   * reflected in the `Content-Length` header when being sent to a client.
+   */
+  get contentLength(): number {
+    return this.#contentLength;
+  }
+
+  async #readRange({ start, end }: ByteRange): Promise<Uint8Array> {
+    if (isDenoFsFile(this.#source)) {
+      return readRange(this.#source, { start, end });
+    }
+    if (this.#source instanceof Blob) {
+      return new Uint8Array(
+        await this.#source.slice(start, end + 1).arrayBuffer(),
+      );
+    }
+    if (this.#source instanceof ArrayBuffer) {
+      return new Uint8Array(this.#source.slice(start, end + 1));
+    }
+
+    const length = end - start;
+    let read = 0;
+    let result: Uint8Array | undefined;
+
+    const processChunk = (chunk: Uint8Array): Uint8Array | undefined => {
+      if (this.#seen + chunk.byteLength >= start) {
+        if (this.#seen < start) {
+          chunk = chunk.slice(start - this.#seen);
+          this.#seen = start;
+        }
+        if (read + chunk.byteLength > length + 1) {
+          this.#previous = chunk.slice(length - read + 1);
+          chunk = chunk.slice(0, length - read + 1);
+        }
+        read += chunk.byteLength;
+        this.#seen += chunk.byteLength;
+        return chunk;
+      }
+      this.#seen += chunk.byteLength;
+    };
+
+    if (this.#previous) {
+      const chunk = this.#previous;
+      this.#previous = undefined;
+      const res = processChunk(chunk);
+      if (res) {
+        result = res;
+      }
+    }
+
+    while (read < length) {
+      const { done, value: chunk } = await this.#source.read();
+      if (chunk) {
+        const res = processChunk(chunk);
+        if (res) {
+          result = result ? concat([result, res]) : res;
+        }
+      }
+      if (done) {
+        throw new RangeError("Unable to read range.");
+      }
+    }
+    assert(result);
+    return result;
+  }
+
+  constructor(
+    source: RangeBodyInit,
+    ranges: ByteRange[],
+    size: number,
+    options: MultiPartByteRangeStreamOptions = {},
+  ) {
+    const {
+      autoClose = true,
+      boundary = "OAK-COMMONS-BOUNDARY",
+      type,
+    } = options;
+    super({
+      pull: async (controller) => {
+        const range = this.#ranges.shift();
+        if (!range) {
+          controller.enqueue(this.#postscript);
+          controller.close();
+          if (autoClose && isDenoFsFile(this.#source)) {
+            this.#source.close();
+          }
+          if (this.#source instanceof ReadableStreamDefaultReader) {
+            this.#source.releaseLock();
+          }
+          return;
+        }
+        const bytes = await this.#readRange(range);
+        const preamble = encoder.encode(
+          `\r\n--${boundary}\r\nContent-Type: ${this.#type}\r\nContent-Range: ${range.start}-${range.end}/${size}\r\n\r\n`,
+        );
+        controller.enqueue(concat([preamble, bytes]));
+      },
+    });
+    this.#boundary = boundary;
+    this.#ranges = [...ranges];
+    this.#ranges.sort(({ start: a }, { start: b }) => a - b);
+    if (ArrayBuffer.isView(source)) {
+      this.#source = source.buffer;
+    } else if (typeof source === "string") {
+      this.#source = encoder.encode(source).buffer;
+    } else if (source instanceof ReadableStream) {
+      this.#source = source.getReader();
+    } else {
+      this.#source = source;
+    }
+    this.#type = type || (source instanceof Blob && source.type) ||
+      "application/octet-stream";
+    this.#postscript = encoder.encode(`\r\n--${boundary}--\r\n`);
+    this.#contentLength = ranges.reduce(
+      (prev, { start, end }): number =>
+        prev +
+        encoder.encode(
+          `\r\n--${boundary}\r\nContent-Type: ${this.#type}\r\nContent-Range: ${start}-${end}/${size}\r\n\r\n`,
+        ).byteLength + (end - start) + 1,
+      this.#postscript.byteLength,
+    );
+  }
 }
 
 /**
@@ -197,17 +411,36 @@ export class RangeByteTransformStream
  * Set {@linkcode Headers} related to returning a content range to the client.
  *
  * This will set the `Accept-Ranges`, `Content-Range` and `Content-Length` as
- * appropriate.
+ * appropriate. If the headers does not contain a `Content-Type` header, and one
+ * is supplied, it will be added.
  */
 export function contentRange(
   headers: Headers,
   range: ByteRange,
   size: number,
+  type?: string,
 ): void {
   const { start, end } = range;
   headers.set("accept-ranges", "bytes");
   headers.set("content-range", `bytes ${start}-${end}/${size}`);
   headers.set("content-length", String(end - start + 1));
+  if (type && !headers.has("content-type")) {
+    headers.set("content-type", type);
+  }
+}
+
+/**
+ * Set {@linkcode Headers} related to returning a multipart byte range response.
+ *
+ * This will set the `Content-Type` and `Content-Length` headers as appropriate.
+ */
+export function multiPartByteRanges(
+  headers: Headers,
+  init: { contentLength: number; boundary: string },
+) {
+  const { contentLength, boundary } = init;
+  headers.set("content-type", `multipart/byteranges; boundary=${boundary}`);
+  headers.set("content-length", String(contentLength));
 }
 
 /**
@@ -230,19 +463,19 @@ export function asLimitedReadableStream(
     start(controller) {
       const pos = fsFile.seekSync(start, Deno.SeekMode.Start);
       if (pos !== start) {
-        controller.error(new RangeError("Could not see to range start."));
+        controller.error(new RangeError("Could not seek to range start."));
       }
     },
     async pull(controller) {
       const chunk = new Uint8Array(Math.min(length - read, chunkSize));
       const count = await fsFile.read(chunk);
       if (count == null) {
-        controller.error(new RangeError("Could not see to range end."));
+        controller.error(new RangeError("Could not read to range end."));
         return;
       }
       controller.enqueue(chunk);
       read += count;
-      if (start + read >= end) {
+      if (read >= length) {
         controller.close();
         if (autoClose) {
           fsFile.close();
@@ -440,26 +673,38 @@ export async function range(
 export function responseRange(
   body: RangeBodyInit,
   size: number,
-  range: ByteRange,
+  ranges: ByteRange[],
   init: ResponseInit = {},
   options: ResponseRangeOptions = {},
 ): Response {
-  if (isDenoFsFile(body)) {
-    body = asLimitedReadableStream(body, range, options);
-  } else if (body instanceof ReadableStream) {
-    body = body.pipeThrough(new RangeByteTransformStream(range));
-  } else if (body instanceof Blob) {
-    body = body.slice(range.start, range.end + 1);
-  } else if (ArrayBuffer.isView(body)) {
-    body = body.buffer.slice(range.start, range.end + 1);
-  } else if (body instanceof ArrayBuffer) {
-    body = body.slice(range.start, range.end + 1);
-  } else if (typeof body === "string") {
-    body = encoder.encode(body).slice(range.start, range.end + 1);
-  } else {
-    throw TypeError("Invalid body type.");
+  if (!ranges.length) {
+    throw new RangeError("At least one range expected.");
   }
-  const res = new Response(body, init);
-  contentRange(res.headers, range, size);
+  if (ranges.length === 1) {
+    const [range] = ranges;
+    let type = options.type ?? "application/octet-stream";
+    if (isDenoFsFile(body)) {
+      body = asLimitedReadableStream(body, range, options);
+    } else if (body instanceof ReadableStream) {
+      body = body.pipeThrough(new RangeByteTransformStream(range));
+    } else if (body instanceof Blob) {
+      type = body.type;
+      body = body.slice(range.start, range.end + 1);
+    } else if (ArrayBuffer.isView(body)) {
+      body = body.buffer.slice(range.start, range.end + 1);
+    } else if (body instanceof ArrayBuffer) {
+      body = body.slice(range.start, range.end + 1);
+    } else if (typeof body === "string") {
+      body = encoder.encode(body).slice(range.start, range.end + 1);
+    } else {
+      throw TypeError("Invalid body type.");
+    }
+    const res = new Response(body, init);
+    contentRange(res.headers, range, size, type);
+    return res;
+  }
+  const stream = new MultiPartByteRangesStream(body, ranges, size, options);
+  const res = new Response(stream, init);
+  multiPartByteRanges(res.headers, stream);
   return res;
 }

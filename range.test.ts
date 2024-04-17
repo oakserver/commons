@@ -6,7 +6,12 @@ import {
   timingSafeEqual,
 } from "./deps_test.ts";
 
-import { range, RangeByteTransformStream, responseRange } from "./range.ts";
+import {
+  MultiPartByteRangesStream,
+  range,
+  RangeByteTransformStream,
+  responseRange,
+} from "./range.ts";
 
 const fixture = new Uint8Array(65_000);
 const fixtureInfo = {
@@ -297,7 +302,7 @@ Deno.test({
     const res = responseRange(
       file,
       stats.size,
-      { start: 0, end: 64_999 },
+      [{ start: 0, end: 64_999 }],
       { headers: { "content-type": "image/png" } },
     );
     const actual = await res.arrayBuffer();
@@ -318,7 +323,7 @@ Deno.test({
     const res = responseRange(
       file,
       stats.size,
-      { start: 65_000, end: 1_050_985 },
+      [{ start: 65_000, end: 1_050_985 }],
       { headers: { "content-type": "image/png" } },
     );
     const actual = await res.arrayBuffer();
@@ -339,7 +344,7 @@ Deno.test({
     const res = responseRange(
       file,
       stats.size,
-      { start: 0, end: 64_999 },
+      [{ start: 0, end: 64_999 }],
       { headers: { "content-type": "image/png" } },
     );
     await res.arrayBuffer();
@@ -357,7 +362,7 @@ Deno.test({
     const res = responseRange(
       file,
       stats.size,
-      { start: 0, end: 64_999 },
+      [{ start: 0, end: 64_999 }],
       { headers: { "content-type": "image/png" } },
       { autoClose: false },
     );
@@ -377,7 +382,7 @@ Deno.test({
     const res = responseRange(
       file.readable,
       stats.size,
-      { start: 65_000, end: 1_050_985 },
+      [{ start: 65_000, end: 1_050_985 }],
       { headers: { "content-type": "image/png" } },
     );
     const actual = await res.arrayBuffer();
@@ -400,7 +405,7 @@ Deno.test({
     const res = responseRange(
       blob,
       1_050_986,
-      { start: 65_000, end: 1_050_985 },
+      [{ start: 65_000, end: 1_050_985 }],
       { headers: { "content-type": "image/png" } },
     );
     const actual = await res.arrayBuffer();
@@ -410,6 +415,40 @@ Deno.test({
       "bytes 65000-1050985/1050986",
     );
     assertEquals(res.headers.get("content-length"), "985986");
+  },
+});
+
+Deno.test({
+  name: "responseRange - multiple ranges",
+  async fn() {
+    const file = await Deno.open("./_fixtures/png-1mb.png");
+    const stats = await file.stat();
+    const res = responseRange(
+      file,
+      stats.size,
+      [
+        {
+          start: 0,
+          end: 499,
+        },
+        { start: 600, end: 600_000 },
+        { start: 1_000_000, end: 1_000_199 },
+        { start: 1_000_200, end: 1_000_299 },
+        { start: 1_001_000, end: 1_050_985 },
+      ],
+      undefined,
+      { type: "image/png" },
+    );
+    const ab = await res.arrayBuffer();
+    assertEquals(res.headers.get("content-length"), String(ab.byteLength));
+    assertEquals(
+      res.headers.get("content-type"),
+      "multipart/byteranges; boundary=OAK-COMMONS-BOUNDARY",
+    );
+    assertEquals(ab.byteLength, 650665);
+    assertThrows(() => {
+      file.close();
+    }, "Bad resource ID");
   },
 });
 
@@ -472,5 +511,170 @@ Deno.test({
     const blob = new Blob(parts);
     const actual = await blob.arrayBuffer();
     assert(timingSafeEqual(fixture, actual));
+  },
+});
+
+Deno.test({
+  name: "MultiPartByteRangesStream - source stream",
+  async fn() {
+    const file = await Deno.open("./_fixtures/png-1mb.png");
+    const stat = await file.stat();
+    const stream = new MultiPartByteRangesStream(
+      file.readable,
+      [
+        {
+          start: 0,
+          end: 499,
+        },
+        { start: 600, end: 600_000 },
+        { start: 1_000_000, end: 1_000_199 },
+        { start: 1_000_200, end: 1_000_299 },
+        { start: 1_001_000, end: 1_050_985 },
+      ],
+      stat.size,
+      { type: "image/png" },
+    );
+    const res = new Response(stream);
+    const ab = await res.arrayBuffer();
+    assertEquals(stream.contentLength, ab.byteLength);
+    assertEquals(stream.boundary, "OAK-COMMONS-BOUNDARY");
+    assertEquals(ab.byteLength, 650665);
+    file.close();
+  },
+});
+
+Deno.test({
+  name: "MultiPartByteRangesStream - source FsFile",
+  async fn() {
+    const file = await Deno.open("./_fixtures/png-1mb.png");
+    const stat = await file.stat();
+    const stream = new MultiPartByteRangesStream(
+      file,
+      [
+        {
+          start: 0,
+          end: 499,
+        },
+        { start: 600, end: 600_000 },
+        { start: 1_000_000, end: 1_000_199 },
+        { start: 1_000_200, end: 1_000_299 },
+        { start: 1_001_000, end: 1_050_985 },
+      ],
+      stat.size,
+      { type: "image/png" },
+    );
+    const res = new Response(stream);
+    const ab = await res.arrayBuffer();
+    assertEquals(stream.contentLength, ab.byteLength);
+    assertEquals(stream.boundary, "OAK-COMMONS-BOUNDARY");
+    assertEquals(ab.byteLength, 650665);
+  },
+});
+
+Deno.test({
+  name: "MultiPartByteRangesStream - source Uint8Array",
+  async fn() {
+    const fixture = await Deno.readFile("./_fixtures/png-1mb.png");
+    const stream = new MultiPartByteRangesStream(
+      fixture,
+      [
+        {
+          start: 0,
+          end: 499,
+        },
+        { start: 600, end: 600_000 },
+        { start: 1_000_000, end: 1_000_199 },
+        { start: 1_000_200, end: 1_000_299 },
+        { start: 1_001_000, end: 1_050_985 },
+      ],
+      fixture.byteLength,
+      { type: "image/png" },
+    );
+    const res = new Response(stream);
+    const ab = await res.arrayBuffer();
+    assertEquals(stream.contentLength, ab.byteLength);
+    assertEquals(stream.boundary, "OAK-COMMONS-BOUNDARY");
+    assertEquals(ab.byteLength, 650665);
+  },
+});
+
+Deno.test({
+  name: "MultiPartByteRangesStream - source Blob",
+  async fn() {
+    const fixture = await Deno.readFile("./_fixtures/png-1mb.png");
+    const blob = new Blob([fixture], { type: "image/png" });
+    const stream = new MultiPartByteRangesStream(
+      blob,
+      [
+        {
+          start: 0,
+          end: 499,
+        },
+        { start: 600, end: 600_000 },
+        { start: 1_000_000, end: 1_000_199 },
+        { start: 1_000_200, end: 1_000_299 },
+        { start: 1_001_000, end: 1_050_985 },
+      ],
+      blob.size,
+    );
+    const res = new Response(stream);
+    const ab = await res.arrayBuffer();
+    assertEquals(stream.contentLength, ab.byteLength);
+    assertEquals(stream.boundary, "OAK-COMMONS-BOUNDARY");
+    assertEquals(ab.byteLength, 650665);
+  },
+});
+
+Deno.test({
+  name: "MultiPartByteRangesStream - source string",
+  async fn() {
+    const fixture = "hello world, ".repeat(500_000);
+    const stream = new MultiPartByteRangesStream(
+      fixture,
+      [
+        {
+          start: 0,
+          end: 499,
+        },
+        { start: 600, end: 600_000 },
+        { start: 1_000_000, end: 1_000_199 },
+        { start: 1_000_200, end: 1_000_299 },
+        { start: 1_001_000, end: 1_050_985 },
+      ],
+      fixture.length,
+      { type: "text/plain" },
+    );
+    const res = new Response(stream);
+    const ab = await res.arrayBuffer();
+    assertEquals(stream.contentLength, ab.byteLength);
+    assertEquals(stream.boundary, "OAK-COMMONS-BOUNDARY");
+    assertEquals(ab.byteLength, 650670);
+  },
+});
+
+Deno.test({
+  name: "MultiPartByteRangesStream - boundary options",
+  async fn() {
+    const fixture = await Deno.readFile("./_fixtures/png-1mb.png");
+    const stream = new MultiPartByteRangesStream(
+      fixture,
+      [
+        {
+          start: 0,
+          end: 499,
+        },
+        { start: 600, end: 600_000 },
+        { start: 1_000_000, end: 1_000_199 },
+        { start: 1_000_200, end: 1_000_299 },
+        { start: 1_001_000, end: 1_050_985 },
+      ],
+      fixture.byteLength,
+      { type: "image/png", boundary: "123456789" },
+    );
+    const res = new Response(stream);
+    const ab = await res.arrayBuffer();
+    assertEquals(stream.contentLength, ab.byteLength);
+    assertEquals(stream.boundary, "123456789");
+    assertEquals(ab.byteLength, 650599);
   },
 });
