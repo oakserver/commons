@@ -1,5 +1,9 @@
 # @oak/commons Change Log
 
+## Version 0.9.0
+
+- feat: add support for multipart byte ranges (29b4ec3)
+
 ## Version 0.8.1
 
 - chore: export range from package (dd3d78c)
