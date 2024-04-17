@@ -309,6 +309,8 @@ Deno.test({
     assert(timingSafeEqual(fixture, actual));
     assertEquals(res.headers.get("content-range"), "bytes 0-64999/1050986");
     assertEquals(res.headers.get("content-length"), "65000");
+    assertEquals(res.status, 206);
+    assertEquals(res.statusText, "Partial Content");
   },
 });
 
@@ -333,6 +335,8 @@ Deno.test({
       "bytes 65000-1050985/1050986",
     );
     assertEquals(res.headers.get("content-length"), "985986");
+    assertEquals(res.status, 206);
+    assertEquals(res.statusText, "Partial Content");
   },
 });
 
@@ -392,6 +396,8 @@ Deno.test({
       "bytes 65000-1050985/1050986",
     );
     assertEquals(res.headers.get("content-length"), "985986");
+    assertEquals(res.status, 206);
+    assertEquals(res.statusText, "Partial Content");
   },
 });
 
@@ -415,6 +421,8 @@ Deno.test({
       "bytes 65000-1050985/1050986",
     );
     assertEquals(res.headers.get("content-length"), "985986");
+    assertEquals(res.status, 206);
+    assertEquals(res.statusText, "Partial Content");
   },
 });
 
@@ -446,6 +454,8 @@ Deno.test({
       "multipart/byteranges; boundary=OAK-COMMONS-BOUNDARY",
     );
     assertEquals(ab.byteLength, 650665);
+    assertEquals(res.status, 206);
+    assertEquals(res.statusText, "Partial Content");
     assertThrows(() => {
       file.close();
     }, "Bad resource ID");

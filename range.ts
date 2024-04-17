@@ -699,12 +699,20 @@ export function responseRange(
     } else {
       throw TypeError("Invalid body type.");
     }
-    const res = new Response(body, init);
+    const res = new Response(body, {
+      ...init,
+      status: 206,
+      statusText: "Partial Content",
+    });
     contentRange(res.headers, range, size, type);
     return res;
   }
   const stream = new MultiPartByteRangesStream(body, ranges, size, options);
-  const res = new Response(stream, init);
+  const res = new Response(stream, {
+    ...init,
+    status: 206,
+    statusText: "Partial Content",
+  });
   multiPartByteRanges(res.headers, stream);
   return res;
 }
