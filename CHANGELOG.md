@@ -1,5 +1,9 @@
 # @oak/commons Change Log
 
+## Version 0.9.1
+
+- feat: return status 206 on range responses (cc5e8f2)
+
 ## Version 0.9.0
 
 - feat: add support for multipart byte ranges (29b4ec3)
