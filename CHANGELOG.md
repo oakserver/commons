@@ -1,5 +1,13 @@
 # @oak/commons Change Log
 
+## Version 0.10.1
+
+- feat: add form data parse (030ac0b)
+
+## Version 0.10.0
+
+_skipped due to a sad mis-tagging adventure_
+
 ## Version 0.9.1
 
 - feat: return status 206 on range responses (cc5e8f2)
