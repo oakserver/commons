@@ -1,0 +1,25 @@
+// Copyright 2018-2024 the oak authors. All rights reserved. MIT license.
+
+import { assertEquals } from "./deps_test.ts";
+
+import { toParamRegExp, unquote } from "./header_utils.ts";
+
+Deno.test({
+  name: "headers - toParamRegExp()",
+  fn() {
+    assertEquals(`foo=bar`.match(toParamRegExp("foo"))![1], "bar");
+    assertEquals(`foo="bar"`.match(toParamRegExp("foo"))![1], `"bar"`);
+    assertEquals(`bar="baz"; foo=bar`.match(toParamRegExp("foo"))![1], "bar");
+    assertEquals(`foobar=bar`.match(toParamRegExp("foo")), null);
+    assertEquals(`foo1=bar`.match(toParamRegExp("foo[0-9]"))![1], "bar");
+  },
+});
+
+Deno.test({
+  name: "headers - unquote()",
+  fn() {
+    assertEquals(unquote("bar"), "bar");
+    assertEquals(unquote(`"bar"`), "bar");
+    assertEquals(unquote(`\"bar\"`), "bar");
+  },
+});

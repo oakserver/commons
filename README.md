@@ -41,6 +41,9 @@ for each modules is the best guide on the usage of the APIs:
 
 - [/cookie_map.ts](https://jsr.io/@oak/commons/doc/cookie_map/~) - an API for
   managing signed and unsigned cookies server side.
+- [/form_data.ts](https://jsr.io/@oak/commons/doc/form_data/~) - the ability to
+  parse a stream body into `FormData` when this functionality isn't available
+  in the runtime.
 - [/http_errors.ts](https://jsr.io/@oak/commons/doc/http_errors/~) - utilities
   for working with HTTP Error status as JavaScript errors.
 - [/media_types.ts](https://jsr.io/@oak/commons/doc/media_types/~) - utilities

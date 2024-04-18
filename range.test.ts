@@ -88,6 +88,28 @@ Deno.test({
 });
 
 Deno.test({
+  name: "range - range full - entity + fileInfo",
+  async fn() {
+    const req = new Request("http://localhost/movie.mp4", {
+      headers: { "range": "bytes=0-" },
+    });
+    const res = await range(req, fixture, fixtureInfo);
+    assertEquals(res, { ok: true, ranges: [{ start: 0, end: 64999 }] });
+  },
+});
+
+Deno.test({
+  name: "range - range full - fileInfo",
+  async fn() {
+    const req = new Request("http://localhost/movie.mp4", {
+      headers: { "range": "bytes=0-" },
+    });
+    const res = await range(req, fixtureInfo);
+    assertEquals(res, { ok: true, ranges: [{ start: 0, end: 64999 }] });
+  },
+});
+
+Deno.test({
   name: "range - range last bytes - entity + fileInfo",
   async fn() {
     const req = new Request("http://localhost/movie.mp4", {
@@ -410,6 +432,52 @@ Deno.test({
     const blob = new Blob([await Deno.readFile("./_fixtures/png-1mb.png")]);
     const res = responseRange(
       blob,
+      1_050_986,
+      [{ start: 65_000, end: 1_050_985 }],
+      { headers: { "content-type": "image/png" } },
+    );
+    const actual = await res.arrayBuffer();
+    assert(timingSafeEqual(fixture, actual));
+    assertEquals(
+      res.headers.get("content-range"),
+      "bytes 65000-1050985/1050986",
+    );
+    assertEquals(res.headers.get("content-length"), "985986");
+    assertEquals(res.status, 206);
+    assertEquals(res.statusText, "Partial Content");
+  },
+});
+
+Deno.test({
+  name: "responseRange - Uint8Array",
+  async fn() {
+    const data = await Deno.readFile("./_fixtures/png-1mb.png");
+    const fixture = data.slice(65_000);
+    const res = responseRange(
+      data,
+      1_050_986,
+      [{ start: 65_000, end: 1_050_985 }],
+      { headers: { "content-type": "image/png" } },
+    );
+    const actual = await res.arrayBuffer();
+    assert(timingSafeEqual(fixture, actual));
+    assertEquals(
+      res.headers.get("content-range"),
+      "bytes 65000-1050985/1050986",
+    );
+    assertEquals(res.headers.get("content-length"), "985986");
+    assertEquals(res.status, 206);
+    assertEquals(res.statusText, "Partial Content");
+  },
+});
+
+Deno.test({
+  name: "responseRange - ArrayBuffer",
+  async fn() {
+    const data = await Deno.readFile("./_fixtures/png-1mb.png");
+    const fixture = data.slice(65_000);
+    const res = responseRange(
+      data.buffer,
       1_050_986,
       [{ start: 65_000, end: 1_050_985 }],
       { headers: { "content-type": "image/png" } },

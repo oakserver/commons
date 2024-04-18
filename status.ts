@@ -1,4 +1,4 @@
-// Copyright 2018-2022 the oak authors. All rights reserved. MIT license.
+// Copyright 2018-2024 the oak authors. All rights reserved. MIT license.
 /**
  * Contains the {@linkcode STATUS_CODE} object which contains standard HTTP
  * status codes and provides several type guards for handling status codes
