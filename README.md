@@ -4,6 +4,9 @@
 [![jsr.io/@oak/commons score](https://jsr.io/badges/@oak/commons/score)](https://jsr.io/@oak/commons)
 [![deno.land/x/oak_commons](https://deno.land/badge/oak_commons/version)](https://deno.land/x/oak_commons)
 
+[![ci](https://github.com/oakserver/commons/workflows/ci/badge.svg)](https://github.com/oakserver/commons)
+[![codecov](https://codecov.io/gh/oakserver/commons/graph/badge.svg?token=zImXfOXhO2)](https://codecov.io/gh/oakserver/commons)
+
 A set of APIs that are common to HTTP/HTTPS servers.
 
 > [!NOTE]

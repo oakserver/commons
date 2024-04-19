@@ -21,4 +21,14 @@ jobs:
         run: deno lint
 
       - name: test
-        run: deno task test
+        run: deno task test:coverage
+
+      - name: generate lcov
+        run: deno task coverage --lcov --output=cov.lcov
+
+      - name: upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: oakserver/commons
+          files: ./cov.lcov

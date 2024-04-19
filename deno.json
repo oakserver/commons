@@ -23,7 +23,9 @@
   },
   "tasks": {
     "bench": "deno bench --allow-read",
-    "test": "deno test --allow-read"
+    "coverage": "deno coverage --output=cov.lcov --lcov ./cov",
+    "test": "deno test --allow-read",
+    "test:coverage": "deno test --allow-read --coverage=./cov"
   },
   "lock": false,
   "fmt": {
