@@ -76,13 +76,13 @@
  * @module
  */
 
-import { assert } from "jsr:/@std/assert@0.222/assert";
-import { concat } from "jsr:/@std/bytes@0.222/concat";
+import { assert } from "jsr:/@std/assert@0.226/assert";
+import { concat } from "jsr:/@std/bytes@0.224/concat";
 import {
   calculate,
   type Entity,
   type FileInfo,
-} from "jsr:/@std/http@0.222/etag";
+} from "jsr:/@std/http@0.224/etag";
 
 /**
  * A descriptor for the start and end of a byte range, which are inclusive of
