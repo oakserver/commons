@@ -1,5 +1,9 @@
 # @oak/commons Change Log
 
+## Version 0.10.2
+
+- chore: update dependencies (c53c610)
+
 ## Version 0.10.1
 
 - feat: add form data parse (030ac0b)
