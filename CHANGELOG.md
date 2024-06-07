@@ -1,5 +1,10 @@
 # @oak/commons Change Log
 
+## Version 0.11.0
+
+- feat: add forwarded parser (6fb5752)
+- docs: complete inline docs for getFilename (17c7007)
+
 ## Version 0.10.2
 
 - chore: update dependencies (c53c610)

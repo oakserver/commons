@@ -1,6 +1,6 @@
 {
   "name": "@oak/commons",
-  "version": "0.10.2",
+  "version": "0.11.0",
   "exports": {
     "./cookie_map": "./cookie_map.ts",
     "./form_data": "./form_data.ts",
