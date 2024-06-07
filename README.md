@@ -47,6 +47,8 @@ for each modules is the best guide on the usage of the APIs:
 - [/form_data.ts](https://jsr.io/@oak/commons/doc/form_data/~) - the ability to
   parse a stream body into `FormData` when this functionality isn't available
   in the runtime.
+- [/forwarded.ts](https://jsr.io/@oak/commons/doc/forwarded/~) - a parser for
+  the `Forwarded` header vale.
 - [/http_errors.ts](https://jsr.io/@oak/commons/doc/http_errors/~) - utilities
   for working with HTTP Error status as JavaScript errors.
 - [/media_types.ts](https://jsr.io/@oak/commons/doc/media_types/~) - utilities
