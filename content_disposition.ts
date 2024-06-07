@@ -113,7 +113,8 @@ function textDecode(encoding: string, value: string): string {
 }
 
 /**
- * Parse a `Content-Disp
+ * Parse a `Content-Disposition` header value to retrieve the filename of the
+ * file.
  */
 export function getFilename(header: string): string {
   needsEncodingFixup = true;
