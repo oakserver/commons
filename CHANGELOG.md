@@ -1,5 +1,22 @@
 # @oak/commons Change Log
 
+## Version 0.12.0
+
+- feat: add `asResponse()` method to HTTP errors (36f8232)
+
+  HTTP errors now supports the method `.asResponse()` which allows HTTP errors
+  to be more easily sent to a client. When a request is supplied as an option to
+  the method, content negotiation will be used to determine the format of the
+  response body, with the `prefer` option given preference to a format during
+  negotiation.
+
+  **BREAKING CHANGE** Because of this, previously HTTP errors took the `headers`
+  option on construction as well as instances had a `.headers` property. This
+  has been removed, and a `headers` option can be instead passed to the
+  `.asResponse()` method.
+
+- chore: update `@std/bytes` version (8a29360)
+
 ## Version 0.11.0
 
 - feat: add forwarded parser (6fb5752)
