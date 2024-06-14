@@ -64,17 +64,18 @@ Deno.test({
       const errorExpose = createHttpError(
         errorStatus,
         STATUS_TEXT[errorStatus],
-        {
-          expose: false,
-          headers: new Headers({ "WWW-Authenticate": "Bearer" }),
-        },
+        { expose: false },
       );
       assertInstanceOf(error, HttpError);
       assertInstanceOf(error, errors[Status[errorStatus] as ErrorStatusKeys]);
       assertEquals(error.name, `${Status[errorStatus]}Error`);
       assertEquals(error.message, STATUS_TEXT[errorStatus]);
       assertEquals(errorExpose.status, errorStatus);
-      assertEquals(errorExpose.headers?.get("WWW-Authenticate"), "Bearer");
+      const res = errorExpose.asResponse({
+        headers: new Headers({ "WWW-Authenticate": "Bearer" }),
+      });
+      assertEquals(res.headers.get("WWW-Authenticate"), "Bearer");
+      assertEquals(res.headers.get("Content-Type"), "application/json");
       assert(error.expose);
       assert(!errorExpose.expose);
     }
@@ -100,7 +101,57 @@ Deno.test({
       assertEquals(error.status, errorStatus);
       assert(!error.expose);
       assert(errorExpose.expose);
-      assert(!error.headers);
     }
+  },
+});
+
+Deno.test({
+  name: "http_error - asResponse() - accept",
+  async fn() {
+    const error = createHttpError(
+      Status.Unauthorized,
+      "Authorization required",
+    );
+    let res = error.asResponse();
+    const body = await res.json();
+    assertEquals(body.status, 401);
+    assertEquals(body.statusText, "Unauthorized");
+    assert(body.stack.startsWith("Unauthorized"));
+    assertEquals(body.message, "Authorization required");
+    let request = new Request("http://localhost:8080", {
+      method: "GET",
+      headers: {
+        "accept":
+          "text/html, application/xhtml+xml, application/xml;q=0.9, image/webp, */*;q=0.8",
+      },
+    });
+    res = error.asResponse({
+      request,
+      prefer: "json",
+      headers: { "WWW-Authenticate": "Bearer" },
+    });
+    assertEquals(res.headers.get("content-type"), "text/html; charset=UTF-8");
+    request = new Request("http://localhost:8080", {
+      method: "GET",
+      headers: { "accept": "application/json, text/html" },
+    });
+    res = error.asResponse({ request, prefer: "json" });
+    assertEquals(
+      res.headers.get("content-type"),
+      "application/json",
+    );
+    res = error.asResponse({ request, prefer: "html" });
+    assertEquals(
+      res.headers.get("content-type"),
+      "text/html; charset=UTF-8",
+    );
+    request = new Request("http://localhost:8080", {
+      headers: { "accept": "img/jpeg" },
+    });
+    res = error.asResponse({ request });
+    assertEquals(
+      res.headers.get("content-type"),
+      "text/plain; charset=UTF-8",
+    );
   },
 });

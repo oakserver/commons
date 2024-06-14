@@ -46,6 +46,9 @@
  * @module
  */
 
+import { accepts } from "jsr:@std/http@0.224/negotiation";
+import { contentType } from "jsr:@std/media-types@0.224/content-type";
+
 import {
   type ErrorStatus,
   isClientErrorStatus,
@@ -107,18 +110,36 @@ export type ErrorStatusKeys = keyof typeof ERROR_STATUS_MAP;
 export interface HttpErrorOptions extends ErrorOptions {
   /** Determine if the underlying error stack should be exposed to a client. */
   expose?: boolean;
-  /** Any headers that should be set when returning the error as a response. */
+}
+
+export interface AsResponseOptions {
+  /**
+   * Any additional headers that should be included when creating the
+   * response.
+   */
   headers?: HeadersInit;
+  /**
+   * When determining what format to respond in, prefer either a JSON or HTML
+   * response. If a request is provided, the accept header will be used to
+   * determine the final response content type.
+   *
+   * Defaults to `"json"`.
+   */
+  prefer?: "json" | "html";
+  /**
+   * An optional {@linkcode Request}, which will be used to determine what
+   * type of response the request can accept.
+   */
+  request?: Request;
 }
 
 /**
  * The base class that all derivative HTTP extend, providing a `status` and an
  * `expose` property.
  */
-export class HttpError extends Error {
-  #status: ErrorStatus = Status.InternalServerError;
+export class HttpError<S extends ErrorStatus = Status.InternalServerError>
+  extends Error {
   #expose: boolean;
-  #headers?: Headers;
   constructor(
     message = "Http Error",
     options?: HttpErrorOptions,
@@ -127,9 +148,6 @@ export class HttpError extends Error {
     this.#expose = options?.expose === undefined
       ? isClientErrorStatus(this.status)
       : options.expose;
-    if (options?.headers) {
-      this.#headers = new Headers(options.headers);
-    }
   }
 
   /** A flag to indicate if the internals of the error, like the stack, should
@@ -139,19 +157,82 @@ export class HttpError extends Error {
   get expose(): boolean {
     return this.#expose;
   }
-  /** The optional headers object that is set on the error. */
-  get headers(): Headers | undefined {
-    return this.#headers;
-  }
+
   /** The error status that is set on the error. */
-  get status(): ErrorStatus {
-    return this.#status;
+  get status(): S {
+    return Status.InternalServerError as S;
+  }
+
+  /**
+   * Format the error as a {@linkcode Response} which can be sent to a client.
+   */
+  asResponse(options: AsResponseOptions = {}): Response {
+    const { prefer = "json", request, headers } = options;
+    const acceptsContent = request
+      ? prefer === "json"
+        ? accepts(request, "application/json", "text/html")
+        : accepts(request, "text/html", "application/json")
+      : prefer === "json"
+      ? "application/json"
+      : "text/html";
+    switch (acceptsContent) {
+      case "application/json":
+        return Response.json({
+          status: this.status,
+          statusText: STATUS_TEXT[this.status],
+          message: this.message,
+          stack: this.#expose ? this.stack : undefined,
+        }, {
+          status: this.status,
+          statusText: STATUS_TEXT[this.status],
+          headers,
+        });
+      case "text/html": {
+        const res = new Response(
+          `<!DOCTYPE html><html>
+        <head>
+          <title>${STATUS_TEXT[this.status]} - ${this.status}</title>
+        </head>
+        <body>
+          <h1>${STATUS_TEXT[this.status]} - ${this.status}</h1>
+          <h2>${this.message}</h2>
+          ${
+            this.#expose && this.stack
+              ? `<h3>Stack trace:</h3><pre>${this.stack}</pre>`
+              : ""
+          }
+        </body>
+      </html>`,
+          {
+            status: this.status,
+            statusText: STATUS_TEXT[this.status],
+            headers,
+          },
+        );
+        res.headers.set("content-type", contentType("html"));
+        return res;
+      }
+    }
+    const res = new Response(
+      `${STATUS_TEXT[this.status]} - ${this.status}\n${this.message}\n\n${
+        this.#expose ? this.stack : ""
+      }`,
+      {
+        status: this.status,
+        statusText: STATUS_TEXT[this.status],
+        headers,
+      },
+    );
+    res.headers.set("content-type", contentType("txt"));
+    return res;
   }
 }
 
-function createHttpErrorConstructor(status: ErrorStatus): typeof HttpError {
+function createHttpErrorConstructor<S extends ErrorStatus>(
+  status: S,
+): typeof HttpError<S> {
   const name = `${Status[status]}Error`;
-  const ErrorCtor = class extends HttpError {
+  const ErrorCtor = class extends HttpError<S> {
     constructor(
       message = STATUS_TEXT[status],
       options?: HttpErrorOptions,
@@ -165,7 +246,7 @@ function createHttpErrorConstructor(status: ErrorStatus): typeof HttpError {
       });
     }
 
-    override get status() {
+    override get status(): S {
       return status;
     }
   };
@@ -188,10 +269,11 @@ function createHttpErrorConstructor(status: ErrorStatus): typeof HttpError {
  * throw new errors.InternalServerError("Ooops!");
  * ```
  */
-export const errors: Record<ErrorStatusKeys, typeof HttpError> = {} as Record<
-  ErrorStatusKeys,
-  typeof HttpError
->;
+export const errors: Record<ErrorStatusKeys, typeof HttpError<ErrorStatus>> =
+  {} as Record<
+    ErrorStatusKeys,
+    typeof HttpError<ErrorStatus>
+  >;
 
 for (const [key, value] of Object.entries(ERROR_STATUS_MAP)) {
   errors[key as ErrorStatusKeys] = createHttpErrorConstructor(value);
@@ -203,12 +285,17 @@ for (const [key, value] of Object.entries(ERROR_STATUS_MAP)) {
  * and error options, which includes the `expose` property to set the `.expose`
  * value on the error.
  */
-export function createHttpError(
-  status: ErrorStatus = Status.InternalServerError,
+export function createHttpError<
+  S extends ErrorStatus = Status.InternalServerError,
+>(
+  status: S = Status.InternalServerError as S,
   message?: string,
   options?: HttpErrorOptions,
-): HttpError {
-  return new errors[Status[status] as ErrorStatusKeys](message, options);
+): HttpError<S> {
+  return new errors[Status[status] as ErrorStatusKeys](
+    message,
+    options,
+  ) as HttpError<S>;
 }
 
 /**
