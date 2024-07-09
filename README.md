@@ -53,6 +53,8 @@ for each modules is the best guide on the usage of the APIs:
   the `Forwarded` header vale.
 - [/http_errors](https://jsr.io/@oak/commons/doc/http_errors/~) - utilities
   for working with HTTP Error status as JavaScript errors.
+- [/keystack](https://jsr.io/@oak/commons/doc/keystack/~) - a key ring
+  implementation to allow for management of rotating encryption keys.
 - [/media_types](https://jsr.io/@oak/commons/doc/media_types/~) - utilities
   for working with media types from a request.
 - [/method](https://jsr.io/@oak/commons/doc/method/~) - utilities for working

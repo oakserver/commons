@@ -7,6 +7,7 @@
     "./form_data": "./form_data.ts",
     "./forwarded": "./forwarded.ts",
     "./http_errors": "./http_errors.ts",
+    "./keystack": "./keystack.ts",
     "./media_types": "./media_types.ts",
     "./method": "./method.ts",
     "./range": "./range.ts",

@@ -6,8 +6,8 @@ import {
   assertRejects,
   assertThrows,
   FakeTime,
-  KeyStack,
 } from "./deps_test.ts";
+import { KeyStack } from "./keystack.ts";
 
 import {
   CookieMap,
