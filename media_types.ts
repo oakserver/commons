@@ -22,7 +22,7 @@
  * @module
  */
 
-import { typeByExtension } from "jsr:@std/media-types@0.224/type-by-extension";
+import { typeByExtension } from "jsr:@std/media-types@^1.0/type-by-extension";
 
 const SUBTYPE_NAME_RE = /^[A-Za-z0-9][A-Za-z0-9!#$&^_.-]{0,126}$/;
 const TYPE_NAME_RE = /^[A-Za-z0-9][A-Za-z0-9!#$&^_-]{0,126}$/;

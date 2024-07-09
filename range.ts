@@ -76,8 +76,8 @@
  * @module
  */
 
-import { assert } from "jsr:/@std/assert@0.226/assert";
-import { concat } from "jsr:/@std/bytes@0.224/concat";
+import { assert } from "jsr:/@std/assert@^1.0/assert";
+import { concat } from "jsr:/@std/bytes@^1.0/concat";
 import {
   calculate,
   type Entity,

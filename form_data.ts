@@ -18,8 +18,8 @@
  * @module
  */
 
-import { concat } from "jsr:/@std/bytes@1/concat";
-import { timingSafeEqual } from "jsr:@std/crypto@0.224/timing-safe-equal";
+import { concat } from "jsr:/@std/bytes@^1.0/concat";
+import { timingSafeEqual } from "jsr:@std/crypto@^1.0/timing-safe-equal";
 
 import { toParamRegExp, unquote } from "./header_utils.ts";
 import { createHttpError } from "./http_errors.ts";
