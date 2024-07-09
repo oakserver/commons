@@ -2,6 +2,7 @@
   "name": "@oak/commons",
   "version": "0.12.0",
   "exports": {
+    "./assert": "./assert.ts",
     "./cookie_map": "./cookie_map.ts",
     "./form_data": "./form_data.ts",
     "./forwarded": "./forwarded.ts",

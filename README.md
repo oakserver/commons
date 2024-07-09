@@ -42,24 +42,26 @@ The
 [inline documentation](https://jsr.io/@oak/commons)
 for each modules is the best guide on the usage of the APIs:
 
-- [/cookie_map.ts](https://jsr.io/@oak/commons/doc/cookie_map/~) - an API for
+- [/assert](https://jsr.io/@oak/commons/doc/cookie_map/~) - an assertion
+  function that throws HTTP errors when the assertion fails.
+- [/cookie_map](https://jsr.io/@oak/commons/doc/cookie_map/~) - an API for
   managing signed and unsigned cookies server side.
-- [/form_data.ts](https://jsr.io/@oak/commons/doc/form_data/~) - the ability to
+- [/form_data](https://jsr.io/@oak/commons/doc/form_data/~) - the ability to
   parse a stream body into `FormData` when this functionality isn't available
   in the runtime.
-- [/forwarded.ts](https://jsr.io/@oak/commons/doc/forwarded/~) - a parser for
+- [/forwarded](https://jsr.io/@oak/commons/doc/forwarded/~) - a parser for
   the `Forwarded` header vale.
-- [/http_errors.ts](https://jsr.io/@oak/commons/doc/http_errors/~) - utilities
+- [/http_errors](https://jsr.io/@oak/commons/doc/http_errors/~) - utilities
   for working with HTTP Error status as JavaScript errors.
-- [/media_types.ts](https://jsr.io/@oak/commons/doc/media_types/~) - utilities
+- [/media_types](https://jsr.io/@oak/commons/doc/media_types/~) - utilities
   for working with media types from a request.
-- [/method.ts](https://jsr.io/@oak/commons/doc/method/~) - utilities for working
+- [/method](https://jsr.io/@oak/commons/doc/method/~) - utilities for working
   with HTTP methods/verbs in a type safe way.
-- [/range.ts](https://jsr.io/@oak/commons/doc/range/~) - utilities for
+- [/range](https://jsr.io/@oak/commons/doc/range/~) - utilities for
   supporting range requests.
-- [/server_sent_event.ts](https://jsr.io/@oak/commons/doc/server_sent_event/~) -
+- [/server_sent_event](https://jsr.io/@oak/commons/doc/server_sent_event/~) -
   an abstraction for managing server sent events like DOM events.
-- [/status.ts](https://jsr.io/@oak/commons/doc/status/~) - utilities for working
+- [/status](https://jsr.io/@oak/commons/doc/status/~) - utilities for working
   with HTTP statuses in a type safe way.
 
 ---

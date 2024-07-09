@@ -301,6 +301,6 @@ export function createHttpError<
 /**
  * A type guard that determines if the value is an HttpError or not.
  */
-export function isHttpError(value: unknown): value is HttpError {
+export function isHttpError(value: unknown): value is HttpError<ErrorStatus> {
   return value instanceof HttpError;
 }
