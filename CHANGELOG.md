@@ -1,5 +1,22 @@
 # @oak/commons Change Log
 
+## Version 0.13.0
+
+- feat: add assert (22ddaa9)
+
+  Oak commons now has an `assert()` function that throws an HTTP error, which is
+  useful when asserting something in middleware or a handler where a more
+  informative response can be sent to the client.
+
+- feat: add keystack (fd092b3)
+
+  Oak commons has taken back over a previous contribution to the Deno std
+  library that was removed. It is used to manage multiple encryption keys and
+  adheres to the interface of the secure cookie map to be able to sign and
+  verify cookies.
+
+- chore: update std dependencies (73b5576)
+
 ## Version 0.12.0
 
 - feat: add `asResponse()` method to HTTP errors (36f8232)
