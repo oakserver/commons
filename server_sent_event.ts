@@ -50,9 +50,11 @@ const DEFAULT_KEEP_ALIVE_INTERVAL = 30_000;
 
 /** Options which can be set when initializing a {@linkcode ServerSentEvent}. */
 export interface ServerSentEventInit extends EventInit {
-  /** Optional arbitrary data to send to the client, data this is a string will
-   * be sent unmodified, otherwise `JSON.parse()` will be used to serialize the
-   * value. */
+  /**
+   * Optional arbitrary data to send to the client, data this is a string will
+   * be sent unmodified, otherwise `JSON.stringify()` will be used to serialize
+   * the value.
+   */
   data?: unknown;
 
   /** An optional `id` which will be sent with the event and exposed in the
