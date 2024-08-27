@@ -1,5 +1,12 @@
 # @oak/commons Change Log
 
+## Version 1.0.0
+
+Stabilization of the library, as Deno std is also stabilized!
+
+- chore: update to @std 1.0 (70da74)
+- docs: correct documentation for `ServerSentEvent` (#1)
+
 ## Version 0.13.0
 
 - feat: add assert (22ddaa9)

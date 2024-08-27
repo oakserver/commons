@@ -1,6 +1,6 @@
 {
   "name": "@oak/commons",
-  "version": "0.13.0",
+  "version": "1.0.0",
   "exports": {
     "./assert": "./assert.ts",
     "./cookie_map": "./cookie_map.ts",
