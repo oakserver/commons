@@ -78,11 +78,7 @@
 
 import { assert } from "jsr:/@std/assert@^1.0/assert";
 import { concat } from "jsr:/@std/bytes@^1.0/concat";
-import {
-  calculate,
-  type Entity,
-  type FileInfo,
-} from "jsr:/@std/http@0.224/etag";
+import { eTag, type FileInfo } from "jsr:/@std/http@^1.0/etag";
 
 /**
  * A descriptor for the start and end of a byte range, which are inclusive of
@@ -168,6 +164,11 @@ export interface ResponseRangeOptions {
    */
   type?: string;
 }
+
+/**
+ * The valid forms of an entity which can be used with the range functions.
+ */
+export type Entity = FileInfo | string | Uint8Array;
 
 const DEFAULT_CHUNK_SIZE = 524_288;
 const ETAG_RE = /(?:W\/)?"[ !#-\x7E\x80-\xFF]+"/;
@@ -587,7 +588,8 @@ export async function range(
       if (!fileInfo || match.startsWith("W")) {
         return { ok: true, ranges: null };
       }
-      if (match !== await calculate(entity)) {
+      // @ts-ignore the types for eTag are not correct
+      if (match !== await eTag(entity)) {
         return { ok: true, ranges: null };
       }
     } else {

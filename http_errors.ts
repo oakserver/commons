@@ -46,7 +46,7 @@
  * @module
  */
 
-import { accepts } from "jsr:@std/http@0.224/negotiation";
+import { accepts } from "jsr:@std/http@^1.0/negotiation";
 import { contentType } from "jsr:@std/media-types@^1.0/content-type";
 
 import {

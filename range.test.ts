@@ -1,10 +1,5 @@
 import { assertThrows } from "./deps_test.ts";
-import {
-  assert,
-  assertEquals,
-  calculate,
-  timingSafeEqual,
-} from "./deps_test.ts";
+import { assert, assertEquals, eTag, timingSafeEqual } from "./deps_test.ts";
 
 import {
   MultiPartByteRangesStream,
@@ -22,8 +17,8 @@ const fixtureInfoNoMtime = {
   size: 65_000,
   mtime: null,
 };
-const etag = (await calculate(fixture))!;
-const weakEtag = (await calculate(fixtureInfo))!;
+const etag = (await eTag(fixture))!;
+const weakEtag = (await eTag(fixtureInfo))!;
 
 Deno.test({
   name: "range - no range - entity + fileInfo",
