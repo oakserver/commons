@@ -68,4 +68,4 @@ for each modules is the best guide on the usage of the APIs:
 
 ---
 
-Copyright 2018 - 2024 the oak authors. All rights reserved. MIT License.
+Copyright 2018 - 2025 the oak authors. All rights reserved. MIT License.

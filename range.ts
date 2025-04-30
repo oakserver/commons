@@ -348,9 +348,9 @@ export class MultiPartByteRangesStream extends ReadableStream<Uint8Array> {
     this.#ranges = [...ranges];
     this.#ranges.sort(({ start: a }, { start: b }) => a - b);
     if (ArrayBuffer.isView(source)) {
-      this.#source = source.buffer;
+      this.#source = source.buffer as ArrayBuffer;
     } else if (typeof source === "string") {
-      this.#source = encoder.encode(source).buffer;
+      this.#source = encoder.encode(source).buffer as ArrayBuffer;
     } else if (source instanceof ReadableStream) {
       this.#source = source.getReader();
     } else {
@@ -693,7 +693,7 @@ export function responseRange(
       type = body.type;
       body = body.slice(range.start, range.end + 1);
     } else if (ArrayBuffer.isView(body)) {
-      body = body.buffer.slice(range.start, range.end + 1);
+      body = body.buffer.slice(range.start, range.end + 1) as ArrayBuffer;
     } else if (body instanceof ArrayBuffer) {
       body = body.slice(range.start, range.end + 1);
     } else if (typeof body === "string") {

@@ -1,8 +1,8 @@
-// Copyright 2018-2024 the oak authors. All rights reserved. MIT license.
+// Copyright 2018-2025 the oak authors. All rights reserved. MIT license.
 
 import { assert } from "./assert.ts";
-import { assertEquals } from "./deps_test.ts";
-import { isHttpError } from "./http_errors.ts";
+import { assertEquals, assertInstanceOf } from "./deps_test.ts";
+import { HttpError, isHttpError } from "./http_errors.ts";
 import { Status } from "./status.ts";
 
 Deno.test({
@@ -34,6 +34,7 @@ Deno.test({
     try {
       assert(false, "This is a custom message.");
     } catch (error) {
+      assertInstanceOf(error, Error);
       assertEquals(error.message, "This is a custom message.");
     }
   },
@@ -45,6 +46,7 @@ Deno.test({
     try {
       assert(false, "This is a custom message.", Status.NotFound);
     } catch (error) {
+      assertInstanceOf(error, HttpError);
       assertEquals(error.status, 404);
       assertEquals(error.expose, true);
     }
@@ -59,6 +61,7 @@ Deno.test({
         expose: false,
       });
     } catch (error) {
+      assertInstanceOf(error, HttpError);
       assertEquals(error.expose, false);
     }
   },

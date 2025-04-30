@@ -1,4 +1,4 @@
-// Copyright 2018-2024 the oak authors. All rights reserved. MIT license.
+// Copyright 2018-2025 the oak authors. All rights reserved. MIT license.
 
 import { parse } from "./form_data.ts";
 import { assertEquals } from "./deps_test.ts";
