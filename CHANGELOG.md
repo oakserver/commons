@@ -1,5 +1,10 @@
 # @oak/commons Change Log
 
+## Version 1.0.1
+
+- chore: add LICENSE (c400039)
+- chore: fix type errors, update copyright (934437b)
+
 ## Version 1.0.0
 
 Stabilization of the library, as Deno std is also stabilized!
