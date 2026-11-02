@@ -1,5 +1,20 @@
 # oak commons
 
+> [!WARNING]
+> **oak commons is retired and this repository is archived (2026-11-03).**
+>
+> Following the retirement of Deno, oak commons is retired and unmaintained —
+> the same rationale as [oak](https://github.com/oakserver/oak) and
+> [acorn](https://github.com/oakserver/acorn). **There is no replacement or
+> successor module.** There will be no further releases, bug fixes or security
+> patches. Existing releases remain available unchanged on
+> [JSR](https://jsr.io/@oak/commons) and
+> [deno.land/x](https://deno.land/x/oak_commons), so existing pinned imports
+> will continue to resolve — but there will be no fixes, no compatibility work
+> for future runtimes, and no support, and oak commons should not be used in
+> new projects. The documentation below is retained for reference. Thank you
+> to everyone who contributed to and used oak commons.
+
 [![jsr.io/@oak/commons](https://jsr.io/badges/@oak/commons)](https://jsr.io/@oak/commons)
 [![jsr.io/@oak/commons score](https://jsr.io/badges/@oak/commons/score)](https://jsr.io/@oak/commons)
 [![deno.land/x/oak_commons](https://deno.land/badge/oak_commons/version)](https://deno.land/x/oak_commons)
